@@ -70,9 +70,13 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
         if (piece.getPieceType() ==PieceType.BISHOP) {
-        BishopCalculator bishopcal = new BishopCalculator(board,myPosition);
-        bishopcal.calculateMoves();
-        return bishopcal.getPossibleMoves();
+            BishopCalculator bishopcal = new BishopCalculator(board,myPosition);
+            bishopcal.calculateMoves();
+            return bishopcal.getPossibleMoves();
+        }
+        if(piece.getPieceType() ==PieceType.KING){
+            KingCalculator kingcal = new KingCalculator(board,myPosition);
+            return kingcal.calculateMoves();
         }
         return List.of();
     }

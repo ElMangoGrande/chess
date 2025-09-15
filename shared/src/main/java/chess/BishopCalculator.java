@@ -14,7 +14,6 @@ public class BishopCalculator {
         this.startPosition = startPosition;
     }
 
-
     public void calculateMoves(){
         int startRow = this.startPosition.getRow();
         int startCol = this.startPosition.getColumn();
@@ -57,7 +56,6 @@ public class BishopCalculator {
         col = startCol + 1;
         while(row > 0 && col < 9){
             ChessPosition newPosition = new ChessPosition(row,col);
-
             ChessPiece target = board.getPiece(newPosition);
             if (target == null) {
                 possibleMoves.add(new ChessMove(startPosition, newPosition, null));
@@ -75,7 +73,6 @@ public class BishopCalculator {
         col = startCol - 1;
         while(row > 0 && col > 0){
             ChessPosition newPosition = new ChessPosition(row,col);
-
             ChessPiece target = board.getPiece(newPosition);
             if (target == null) {
                 possibleMoves.add(new ChessMove(startPosition, newPosition, null));
