@@ -82,6 +82,14 @@ public class ChessPiece {
             KnightCalculator knightcal = new KnightCalculator(board,myPosition);
             return knightcal.calculateMoves();
         }
+        if(piece.getPieceType() ==PieceType.ROOK){
+            RookCalculator rookcal = new RookCalculator(board,myPosition);
+            return rookcal.calculateMoves();
+        }
+        if(piece.getPieceType() ==PieceType.QUEEN){
+            QueenCalculator queencal = new QueenCalculator(board,myPosition);
+            return queencal.calculateMoves();
+        }
         return List.of();
     }
 }
