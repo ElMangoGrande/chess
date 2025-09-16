@@ -90,6 +90,10 @@ public class ChessPiece {
             QueenCalculator queencal = new QueenCalculator(board,myPosition);
             return queencal.calculateMoves();
         }
+        if(piece.getPieceType() ==PieceType.PAWN){
+            PawnCalculator pawncal = new PawnCalculator(board,myPosition);
+            return pawncal.calculateMoves();
+        }
         return List.of();
     }
 }
