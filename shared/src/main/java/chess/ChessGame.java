@@ -94,11 +94,26 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if(board.getPiece(move.getStartPosition()) ==null){
+            throw new InvalidMoveException("nothing to move here!");
+        }
         Collection<ChessMove> valid =validMoves(move.getStartPosition());
-        if(valid.contains(move)) {
-            board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
-            board.addPiece(move.getStartPosition(), null);
-            WhiteTurn = !WhiteTurn;
+        if(getTeamTurn() != board.getPiece(move.getStartPosition()).getTeamColor()){
+            throw new InvalidMoveException("not your turn!");
+        }
+        if(valid.contains(move) && board.getPiece(move.getStartPosition())!=null) {
+            if(move.getPromotionPiece() !=null){
+                ChessPiece oldPiece = board.getPiece(move.getStartPosition());
+                ChessPiece promotedPiece = new ChessPiece(oldPiece.getTeamColor(),move.getPromotionPiece());
+                board.addPiece(move.getEndPosition(),promotedPiece);
+                board.addPiece(move.getStartPosition(),null);
+                WhiteTurn = !WhiteTurn;
+            }else{
+                board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+                board.addPiece(move.getStartPosition(), null);
+                WhiteTurn = !WhiteTurn;
+            }
+
         }else{
             WhiteTurn = !WhiteTurn;
             throw new InvalidMoveException("invalid move");
