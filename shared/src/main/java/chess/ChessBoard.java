@@ -26,6 +26,24 @@ public class ChessBoard {
         tiles[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
+    public ChessBoard copy() {
+        ChessBoard copy = new ChessBoard();
+
+        // Loop through all positions on the board
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = getPiece(pos);
+                if (piece != null) {
+                    copy.addPiece(pos, piece);
+                }
+            }
+        }
+
+        return copy;
+    }
+
+
     /**
      * Gets a chess piece on the chessboard
      *

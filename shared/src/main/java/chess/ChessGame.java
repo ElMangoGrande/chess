@@ -59,7 +59,32 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        //gets and stores useful information
+        Collection<ChessMove> possibleMoves = board.getPiece(startPosition).pieceMoves(board,startPosition);
+        ChessPiece piece = board.getPiece(startPosition);
+        ChessGame.TeamColor teamColor = piece.getTeamColor();
+
+        //goes through all possible moves for a piece at a given position
+        for(ChessMove move: possibleMoves){
+            //creates a new board for each theoretical future board
+            ChessBoard newBoard = board.copy();
+            newBoard.addPiece(move.getEndPosition(),board.getPiece(startPosition));
+            newBoard.addPiece(startPosition,null);
+
+            // temporarily swap in the simulated board
+            ChessBoard oldBoard = this.board;
+            this.board = newBoard;
+            boolean inCheck = isInCheck(piece.getTeamColor());
+            this.board = oldBoard; // restore the real board
+
+            //checks to see if the king of the same team as start would be in check
+            if(!inCheck){
+                // if not in check adds the move
+                validMoves.add(move);
+            }
+        }
+        return validMoves;
     }
 
     /**
@@ -122,6 +147,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+
         throw new RuntimeException("Not implemented");
     }
 
