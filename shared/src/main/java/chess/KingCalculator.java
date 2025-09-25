@@ -9,7 +9,7 @@ public class KingCalculator {
     private final ChessBoard board;
 
     public KingCalculator(ChessBoard board, ChessPosition startPosition) {
-        this.possibleMoves = new ArrayList<>();
+        this.possibleMoves = new ArrayList<ChessMove>();
         this.startPosition = startPosition;
         this.board = board;
     }
