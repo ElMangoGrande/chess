@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -16,6 +17,7 @@ public class ChessGame {
 
     public ChessGame() {
     this.board = new ChessBoard();
+    this.board.resetBoard();
     this.WhiteTurn = true;
     }
 
@@ -144,13 +146,13 @@ public class ChessGame {
             throw new IllegalStateException("No king found for " + teamColor);
         }
 
+        TeamColor opponent = (teamColor == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
         //go through all chess pieces in the board on the opposing team
-        for (int row = 1; row < 9; row++) {
-            for (int col = 1; col < 9; col++) {
-                ChessPiece piece = board.getPiece(new ChessPosition(row,col));
-                if(piece != null) {
-                    List<ChessMove> pieceMoves = (List<ChessMove>) piece.pieceMoves(board, new ChessPosition(row, col));
-                    for (ChessMove move : pieceMoves) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                if (piece != null && piece.getTeamColor() == opponent) {
+                    for (ChessMove move : piece.pieceMoves(board, new ChessPosition(row, col))) {
                         if (move.getEndPosition().equals(kingPosition)) {
                             return true;
                         }
@@ -170,9 +172,43 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        //checks to see that a team is in check
+        if(isInCheck(teamColor)) {
+            //goes through all pieces
+            for (int row = 1; row < 9; row++) {
+                for (int col = 1; col < 9; col++) {
+                    //checks for pieces on the same team
+                    ChessPosition newPos = new ChessPosition(row,col);
+                    ChessPiece newPiece =board.getPiece(newPos);
+                    if(newPiece != null && newPiece.getTeamColor() == teamColor){
+                        Collection<ChessMove> valids = validMoves(newPos);
+                        //checks each future hypothetical move
+                        for(ChessMove move: valids){
+                            // simulate on a copy board
+                            ChessBoard newBoard = board.copy();
+                            newBoard.addPiece(move.getEndPosition(), newPiece);
+                            newBoard.addPiece(newPos, null);
 
-        throw new RuntimeException("Not implemented");
-    }
+                            // temporarily swap
+                            ChessBoard oldBoard = this.board;
+                            this.board = newBoard;
+                            boolean stillInCheck = isInCheck(teamColor);
+                            this.board = oldBoard;
+
+                            // if any move gets us out of check -> not checkmate
+                                if (!stillInCheck) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            return true;
+            }
+        return false;
+        }
+
+
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
@@ -190,9 +226,9 @@ public class ChessGame {
             for (int col = 1; col < 9; col++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(row,col));
                 //in the team
-                if(piece.getTeamColor() == teamColor) {
+                if(piece != null && piece.getTeamColor() == teamColor) {
                     //collects all valid moves
-                    validMoves.addAll(validMoves(new ChessPosition(col,row)));
+                    validMoves.addAll(validMoves(new ChessPosition(row,col)));
                 }
             }
         }
@@ -219,5 +255,19 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return WhiteTurn == chessGame.WhiteTurn && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, WhiteTurn);
     }
 }
