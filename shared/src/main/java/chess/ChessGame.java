@@ -96,13 +96,16 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        //checks to see if there is a piece to move
         if(board.getPiece(move.getStartPosition()) ==null){
             throw new InvalidMoveException("nothing to move here!");
         }
         Collection<ChessMove> valid =validMoves(move.getStartPosition());
+        //checks if it is the correct turn
         if(getTeamTurn() != board.getPiece(move.getStartPosition()).getTeamColor()){
             throw new InvalidMoveException("not your turn!");
         }
+        //checks to see that there are moves to be made
         if(valid.contains(move) && board.getPiece(move.getStartPosition())!=null) {
             if(move.getPromotionPiece() !=null){
                 ChessPiece oldPiece = board.getPiece(move.getStartPosition());
@@ -132,6 +135,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         //find the king of our team
         ChessPosition kingPosition = null;
+        //go through every piece
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(row,col));
@@ -141,7 +145,7 @@ public class ChessGame {
                 }
             }
         }
-
+        //checks to see if there is no king
         if (kingPosition == null) {
             throw new IllegalStateException("No king found for " + teamColor);
         }
