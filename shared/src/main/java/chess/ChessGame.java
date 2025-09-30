@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,11 +37,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        if(team == TeamColor.WHITE){
-            WhiteTurn = true;
-        }else{
-            WhiteTurn = false;
-        }
+        WhiteTurn = team == TeamColor.WHITE;
     }
 
     /**
@@ -111,13 +106,11 @@ public class ChessGame {
                 ChessPiece oldPiece = board.getPiece(move.getStartPosition());
                 ChessPiece promotedPiece = new ChessPiece(oldPiece.getTeamColor(),move.getPromotionPiece());
                 board.addPiece(move.getEndPosition(),promotedPiece);
-                board.addPiece(move.getStartPosition(),null);
-                WhiteTurn = !WhiteTurn;
             }else{
                 board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
-                board.addPiece(move.getStartPosition(), null);
-                WhiteTurn = !WhiteTurn;
             }
+            board.addPiece(move.getStartPosition(),null);
+            WhiteTurn = !WhiteTurn;
 
         }else{
             WhiteTurn = !WhiteTurn;
@@ -237,10 +230,7 @@ public class ChessGame {
             }
         }
         //if there are any valid moves return true
-        if(!isInCheck(teamColor) && validMoves.isEmpty()){
-            return true;
-        }
-        return false;
+        return !isInCheck(teamColor) && validMoves.isEmpty();
     }
 
     /**
