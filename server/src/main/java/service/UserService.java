@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
+
 import model.*;
 
 import dataaccess.UserDao;
@@ -36,7 +36,7 @@ public class UserService {
             return new RegistrationResult(registerRequest.username(), authdata.authToken());
     }
 
-    public LoginResult login(LoginRequest loginRequest) {
+    public LoginResult login(LoginRequest loginRequest) throws DoesNotExistException, AlreadyTakenException{
         //Gets the user
         try{UserData user = UserDao.getUser(loginRequest.username());}
         catch (DataAccessException e) {
@@ -52,7 +52,7 @@ public class UserService {
         return new LoginResult(loginRequest.username(), authdata.authToken());
     }
 
-    public void logout(LogoutRequest logoutRequest) {
+    public void logout(LogoutRequest logoutRequest) throws DoesNotExistException{
         try{
             AuthData data = AuthDao.getAuth(logoutRequest.authToken());
             AuthDao.deleteAuth(data);

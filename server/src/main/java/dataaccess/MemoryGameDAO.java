@@ -34,6 +34,9 @@ public class MemoryGameDAO implements GameDao{
 
     @Override
     public Set<GameData> listGames() throws DataAccessException{
+        if(GAME_DATA.isEmpty()){
+            throw new DataAccessException("Error: No Games Exist");
+        }
         return GAME_DATA;
     }
 
