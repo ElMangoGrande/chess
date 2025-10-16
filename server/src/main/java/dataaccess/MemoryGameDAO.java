@@ -39,25 +39,30 @@ public class MemoryGameDAO implements GameDao{
 
     @Override
     public void updateGame(int gameID, String color, String username, ChessMove move) throws DataAccessException{
-        for(GameData game : GAME_DATA){
-            if(game.gameId()== gameID){
-                if(color != null && username != null){
-                    if(color == "White"){
-                        if(move != null){
-                            game.game().makeMove(move);
-                        }
-                        GameData updateGame = new GameData(gameID,username,game.blackUsername(),game.gameName(),game.game());
-                    }
-                    if(color == "Black"){
-
-                    }
-                }
-                GameData updateGame = new GameData(gameID,game.whiteUsername(),game.blackUsername(),)
-                GAME_DATA.remove(game);
-                GAME_DATA.add(updateGame);
-            }
+        GameData game = getGame(gameID);
+        if(game == null){
+            throw new DataAccessException("Error: Game not found");
         }
-        throw new DataAccessException("Error: Game not found");
+
+        GameData updateGame = game;
+
+        if(color != null && username != null){
+            if(color.equals("White")){
+                updateGame = new GameData(gameID,username,game.blackUsername(),game.gameName(),game.game());
+            }
+            if(color.equals("Black")){
+                updateGame = new GameData(gameID,game.whiteUsername(),username,game.gameName(),game.game());
+            }
+        }else if(move != null){
+            ChessGame currentGame = game.game();
+            currentGame.makeMove(move);
+            updateGame = new GameData(gameID,game.whiteUsername(),game.whiteUsername(),game.gameName(),game.game());
+
+        }
+
+        GAME_DATA.remove(game);
+        GAME_DATA.add(updateGame);
+
     }
 
     @Override
