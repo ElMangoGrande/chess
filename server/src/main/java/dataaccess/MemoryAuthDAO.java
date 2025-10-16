@@ -32,4 +32,9 @@ public class MemoryAuthDAO implements AuthDao{
     public void deleteAuth(AuthData auth){
         AUTH_DATA.remove(auth);
     }
+
+    @Override
+    public void clear(){
+        AUTH_DATA.clear();
+    }
 }
