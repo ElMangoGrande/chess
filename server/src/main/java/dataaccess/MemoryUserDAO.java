@@ -12,13 +12,14 @@ public class MemoryUserDAO implements UserDao{
     @Override
     public void createUser(RegistrationRequest registrationRequest) throws DataAccessException{
         String newUsername = registrationRequest.username();
-        for(UserData user : USER_DATA){
-            if(user.username().equals(newUsername)){
-                throw new DataAccessException("Error: username already in use");
-            }
+        try {
+            UserData user = getUser(registrationRequest.username());
+            throw new DataAccessException("Error: username already exists");
+        }catch(DataAccessException e){
+            UserData newUser = new UserData(newUsername, registrationRequest.password(), registrationRequest.email());
+            USER_DATA.add(newUser);
         }
-        UserData newUser = new UserData(newUsername, registrationRequest.password(), registrationRequest.email());
-        USER_DATA.add(newUser);
+
     }
 
     @Override
