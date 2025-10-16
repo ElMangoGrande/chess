@@ -47,10 +47,10 @@ public class MemoryGameDAO implements GameDao{
         GameData updateGame = game;
 
         if(color != null && username != null){
-            if(color.equals("White")){
+            if(color.equals("WHITE")){
                 updateGame = new GameData(gameID,username,game.blackUsername(),game.gameName(),game.game());
             }
-            if(color.equals("Black")){
+            if(color.equals("BLACK")){
                 updateGame = new GameData(gameID,game.whiteUsername(),username,game.gameName(),game.game());
             }
         }else if(move != null){
