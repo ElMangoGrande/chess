@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.InvalidMoveException;
 import model.GameData;
 
 import java.util.HashSet;
@@ -58,9 +59,8 @@ public class MemoryGameDAO implements GameDao{
             }
         }else if(move != null){
             ChessGame currentGame = game.game();
-            currentGame.makeMove(move);
-            updateGame = new GameData(gameID,game.whiteUsername(),game.whiteUsername(),game.gameName(),game.game());
-
+                currentGame.makeMove(move);
+                updateGame = new GameData(gameID, game.whiteUsername(), game.whiteUsername(), game.gameName(), game.game());
         }
 
         GAME_DATA.remove(game);
