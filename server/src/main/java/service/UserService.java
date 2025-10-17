@@ -13,8 +13,8 @@ import java.util.UUID;
 
 public class UserService {
 
-    private UserDao UserDao;
-    private AuthDao AuthDao;
+    private static UserDao UserDao;
+    private static AuthDao AuthDao;
 
     public UserService(UserDao passedDao, AuthDao authDao) {
         UserDao = passedDao;
@@ -24,7 +24,7 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    public RegistrationResult register(RegistrationRequest registerRequest) throws DataAccessException{
+    public static RegistrationResult register(RegistrationRequest registerRequest) throws DataAccessException{
         if(registerRequest.username() == null){
             throw new BadMessageException("Error: no username provided");
         }
@@ -40,7 +40,7 @@ public class UserService {
         return new RegistrationResult(registerRequest.username(), authdata.authToken());
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws DataAccessException{
+    public static LoginResult login(LoginRequest loginRequest) throws DataAccessException{
 
         if(loginRequest.username() == null){
             throw new BadMessageException("Error: no username provided");
