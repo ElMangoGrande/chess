@@ -20,7 +20,7 @@ import java.util.Map;
 public class Server {
 
     private final Javalin javalin;
-    private static final Gson myGson = new Gson();
+    private static final Gson MyGson = new Gson();
 
     private static UserService user;
     private static GameService game;
@@ -57,15 +57,15 @@ public class Server {
     }
 
     private static void displayError(Exception e, int errorCode, Context ctx) {
-        String errorJson = myGson.toJson(Map.of("message", e.getMessage()));
+        String errorJson = MyGson.toJson(Map.of("message", e.getMessage()));
         ctx.status(errorCode).result(errorJson).contentType("application/json");
     }
 
     private static void handleRegister(Context ctx){
         try {
-            RegistrationRequest request = myGson.fromJson(ctx.body(), RegistrationRequest.class);
+            RegistrationRequest request = MyGson.fromJson(ctx.body(), RegistrationRequest.class);
             RegistrationResult result = user.register(request);
-            String resultJson = myGson.toJson(result);
+            String resultJson = MyGson.toJson(result);
             ctx.status(200).result(resultJson).contentType("application/json");
         }
         catch (AlreadyTakenException e) {
@@ -81,9 +81,9 @@ public class Server {
 
     private static void handleLogin(Context ctx){
         try {
-            LoginRequest request = myGson.fromJson(ctx.body(), LoginRequest.class);
+            LoginRequest request = MyGson.fromJson(ctx.body(), LoginRequest.class);
             LoginResult result = user.login(request);
-            String resultJson = myGson.toJson(result);
+            String resultJson = MyGson.toJson(result);
             ctx.status(200).result(resultJson).contentType("application/json");
         }
         catch (UnauthorizedResponse e) {
@@ -115,7 +115,7 @@ public class Server {
         try {
             ListGamesRequest request = new ListGamesRequest(ctx.header("authorization"));
             ListGamesResult result = game.listGames(request);
-            String resultJson = myGson.toJson(result);
+            String resultJson = MyGson.toJson(result);
             ctx.status(200).result(resultJson).contentType("application/json");
         }
         catch (UnauthorizedResponse e) {
@@ -128,10 +128,10 @@ public class Server {
 
     private static void handleCreateGame(Context ctx){
         try {
-            CreateGameRequest body = myGson.fromJson(ctx.body(), CreateGameRequest.class);
+            CreateGameRequest body = MyGson.fromJson(ctx.body(), CreateGameRequest.class);
             CreateGameRequest request = new CreateGameRequest(ctx.header("authorization"),body.gameName());
             CreateGameResult result = game.createGame(request);
-            String resultJson = myGson.toJson(result);
+            String resultJson = MyGson.toJson(result);
             ctx.status(200).result(resultJson).contentType("application/json");
         }
         catch (UnauthorizedResponse e) {
@@ -147,7 +147,7 @@ public class Server {
 
     private static void handleJoinGame(Context ctx){
         try {
-            JoinGameRequest body = myGson.fromJson(ctx.body(), JoinGameRequest.class);
+            JoinGameRequest body = MyGson.fromJson(ctx.body(), JoinGameRequest.class);
             JoinGameRequest request = new JoinGameRequest(body.playerColor(),body.gameID(),ctx.header("authorization"));
             game.joinGame(request);
             ctx.status(200);
