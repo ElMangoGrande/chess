@@ -60,15 +60,14 @@ public class UserService {
         return new LoginResult(loginRequest.username(), authdata.authToken());
     }
 
-    public void logout(LogoutRequest logoutRequest) throws DoesNotExistException{
-        try{
-            AuthData data = AuthDao.getAuth(logoutRequest.authToken());
-            AuthDao.deleteAuth(data);
-        }
-        catch (DataAccessException e) {
-            throw new DoesNotExistException(e.getMessage());
-        }
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException{
+        AuthData data = AuthDao.getAuth(logoutRequest.authToken());
+        AuthDao.deleteAuth(data);
+    }
 
+    public void clearUsers(){
+        UserDao.clear();
+        AuthDao.clear();
     }
 
 }

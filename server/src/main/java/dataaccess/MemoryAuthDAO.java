@@ -1,5 +1,6 @@
 package dataaccess;
 
+import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
 
 import java.util.HashSet;
@@ -25,7 +26,7 @@ public class MemoryAuthDAO implements AuthDao{
                 return auth;
             }
         }
-        throw new DataAccessException("Error: No authToken Found");
+        throw new UnauthorizedResponse("Error: No authToken Found");
     }
 
     @Override
