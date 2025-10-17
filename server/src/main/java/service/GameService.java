@@ -11,8 +11,8 @@ import java.util.Set;
 
 public class GameService {
 
-    private GameDao GameDao;
-    private AuthDao AuthDao;
+    private static GameDao GameDao;
+    private static AuthDao AuthDao;
 
     public GameService(GameDao passedGameDao, AuthDao authDao) {
         GameDao = passedGameDao;
@@ -29,7 +29,7 @@ public class GameService {
         return new ListGamesResult(gameDataSet);
     }
 
-    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException{
+    public  CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException{
         if(createGameRequest.gameName()==null){
             throw new BadMessageException("Error: no game name given");
         }

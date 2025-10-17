@@ -1,7 +1,9 @@
 package dataaccess;
 
+import io.javalin.http.UnauthorizedResponse;
 import model.RegistrationRequest;
 import model.UserData;
+import service.AlreadyTakenException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +14,7 @@ public class MemoryUserDAO implements UserDao{
     @Override
     public void createUser(UserData user) throws DataAccessException{
         if(USER_DATA.contains(user)) {
-            throw new DataAccessException("Error: username already exists");
+            throw new AlreadyTakenException("Error: username already exists");
         }
         USER_DATA.add(user);
     }
@@ -24,7 +26,7 @@ public class MemoryUserDAO implements UserDao{
                 return user;
             }
         }
-        throw new DataAccessException("Error: User does not exist");
+        throw new UnauthorizedResponse("Error: User does not exist");
     }
 
     @Override

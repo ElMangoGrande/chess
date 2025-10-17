@@ -20,11 +20,11 @@ public class UserService {
         UserDao = passedDao;
         AuthDao = authDao;
     }
-    public static String generateToken() {
+    public  String generateToken() {
         return UUID.randomUUID().toString();
     }
 
-    public static RegistrationResult register(RegistrationRequest registerRequest) throws DataAccessException{
+    public  RegistrationResult register(RegistrationRequest registerRequest) throws DataAccessException{
         if(registerRequest.username() == null){
             throw new BadMessageException("Error: no username provided");
         }
@@ -40,7 +40,7 @@ public class UserService {
         return new RegistrationResult(registerRequest.username(), authdata.authToken());
     }
 
-    public static LoginResult login(LoginRequest loginRequest) throws DataAccessException{
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException{
 
         if(loginRequest.username() == null){
             throw new BadMessageException("Error: no username provided");

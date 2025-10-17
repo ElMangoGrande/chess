@@ -2,6 +2,7 @@ package dataaccess;
 
 import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
+import service.AlreadyTakenException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +14,7 @@ public class MemoryAuthDAO implements AuthDao{
     @Override
     public void createAuth(AuthData auth) throws DataAccessException{
         if(AUTH_DATA.contains(auth)){
-            throw new DataAccessException("Error: AuthToken exists already");
+            throw new AlreadyTakenException("Error: AuthToken exists already");
         }else{
             AUTH_DATA.add(auth);
         }
