@@ -28,7 +28,7 @@ public class MemoryGameDAO implements GameDao{
     @Override
     public GameData getGame(int gameID) throws DataAccessException{
         for(GameData game : GAME_DATA){
-            if(game.gameId()== gameID){
+            if(game.gameID()== gameID){
                 return game;
             }
         }
@@ -43,33 +43,31 @@ public class MemoryGameDAO implements GameDao{
     @Override
     public void updateGame(int gameID, String color, String username, ChessMove move) throws DataAccessException, InvalidMoveException {
         GameData game = getGame(gameID);
-        GameData updateGame = game;
 
         if(color != null && username != null){
             if(color.equals("WHITE")){
                 if(game.whiteUsername() != null){
                     throw new AlreadyTakenException("Error: Username already taken");
                 }
-                updateGame = new GameData(gameID,username,game.blackUsername(),game.gameName(),game.game());
+                GameData updateGame = new GameData(gameID,username,game.blackUsername(),game.gameName(),game.game());
+                GAME_DATA.remove(game);
+                GAME_DATA.add(updateGame);
+                return;
             }
             else if(color.equals("BLACK")){
                 if(game.blackUsername() != null){
                     throw new AlreadyTakenException("Error: Username already taken");
                 }
-                updateGame = new GameData(gameID,game.whiteUsername(),username,game.gameName(),game.game());
-            }else{
-                throw new BadMessageException("Error: Bad Color!");
+                GameData updateGame = new GameData(gameID,game.whiteUsername(),username,game.gameName(),game.game());
+                GAME_DATA.remove(game);
+                GAME_DATA.add(updateGame);
+                return;
             }
         }else if(move != null){
-            ChessGame currentGame = game.game();
-                currentGame.makeMove(move);
-                updateGame = new GameData(gameID, game.whiteUsername(), game.whiteUsername(), game.gameName(), game.game());
-        }else{
-            throw new BadMessageException("Error: no update specified");
+            game.game().makeMove(move);
+            return;
         }
-
-        GAME_DATA.remove(game);
-        GAME_DATA.add(updateGame);
+        throw new BadMessageException("Error: no update specified");
 
     }
 

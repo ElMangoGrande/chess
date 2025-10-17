@@ -1,10 +1,10 @@
 package service;
 
+import chess.InvalidMoveException;
 import dataaccess.*;
-import model.CreateGameRequest;
-import model.ListGamesRequest;
-import model.ListGamesResult;
-import model.RegistrationRequest;
+import io.javalin.http.UnauthorizedResponse;
+import model.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,11 +12,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameServiceTest {
 
-    private GameService gameService;
-    String authToken;
+    private static GameService gameService;
+    static String authToken;
 
-    @BeforeEach
-    void setup() throws DataAccessException {
+    @BeforeAll
+    static void setup() throws DataAccessException {
         GameDao gameDao = new MemoryGameDAO();
         AuthDao authDao = new MemoryAuthDAO();
         UserDao userDao = new MemoryUserDAO();
@@ -29,16 +29,19 @@ class GameServiceTest {
     }
 
     @Test
-    void listGamesPass() throws DataAccessException {
+    void listGamesPass() throws DataAccessException, InvalidMoveException {
         gameService.createGame(new CreateGameRequest(authToken,"New Game"));
         ListGamesResult results = gameService.listGames(new ListGamesRequest(authToken));
-
-        System.out.println(results);
+        gameService.JoinGame(new JoinGameRequest("WHITE",1,authToken));
+        GameData game = results.allGameData().iterator().next();
+        assertEquals(1,game.gameID());
+        assertEquals("Hyrum",game.whiteUsername());
     }
 
     @Test
     void listGamesFail() {
-
+        ListGamesRequest listGamesRequest = new ListGamesRequest("gamerWord");
+        assertThrows(UnauthorizedResponse.class, () -> gameService.listGames(listGamesRequest));
     }
 
     @Test

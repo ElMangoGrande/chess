@@ -37,7 +37,7 @@ public class GameService {
         AuthDao.getAuth(createGameRequest.authToken());
         //creates a game
         GameData newGame = GameDao.createGame(createGameRequest.gameName());
-        return new CreateGameResult(newGame.gameId());
+        return new CreateGameResult(newGame.gameID());
     }
 
     public void JoinGame(JoinGameRequest joinGameRequest) throws DataAccessException, InvalidMoveException{
@@ -49,7 +49,7 @@ public class GameService {
         //gets the game
         GameData game = GameDao.getGame(joinGameRequest.gameID());
         //updates the game
-        GameDao.updateGame(game.gameId(), joinGameRequest.playerColor(), username, null);
+        GameDao.updateGame(joinGameRequest.gameID(), joinGameRequest.playerColor(), username, null);
     }
 
     public void clearGames(){
