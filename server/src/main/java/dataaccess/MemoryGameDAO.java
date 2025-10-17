@@ -4,6 +4,8 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
 import model.GameData;
+import org.eclipse.jetty.http.BadMessageException;
+import service.AlreadyTakenException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,33 +36,34 @@ public class MemoryGameDAO implements GameDao{
     }
 
     @Override
-    public Set<GameData> listGames() throws DataAccessException{
-        if(GAME_DATA.isEmpty()){
-            throw new DataAccessException("Error: No Games Exist");
-        }
+    public Set<GameData> listGames(){
         return GAME_DATA;
     }
 
     @Override
-    public void updateGame(int gameID, String color, String username, ChessMove move) throws DataAccessException{
+    public void updateGame(int gameID, String color, String username, ChessMove move) throws DataAccessException, InvalidMoveException {
         GameData game = getGame(gameID);
-        if(game == null){
-            throw new DataAccessException("Error: Game not found");
-        }
-
         GameData updateGame = game;
 
         if(color != null && username != null){
             if(color.equals("WHITE")){
+                if(game.whiteUsername() != null){
+                    throw new AlreadyTakenException("Error: Username already taken");
+                }
                 updateGame = new GameData(gameID,username,game.blackUsername(),game.gameName(),game.game());
             }
             if(color.equals("BLACK")){
+                if(game.blackUsername() != null){
+                    throw new AlreadyTakenException("Error: Username already taken");
+                }
                 updateGame = new GameData(gameID,game.whiteUsername(),username,game.gameName(),game.game());
             }
         }else if(move != null){
             ChessGame currentGame = game.game();
                 currentGame.makeMove(move);
                 updateGame = new GameData(gameID, game.whiteUsername(), game.whiteUsername(), game.gameName(), game.game());
+        }else{
+            throw new BadMessageException("Error: no update specified");
         }
 
         GAME_DATA.remove(game);

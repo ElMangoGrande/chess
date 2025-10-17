@@ -10,16 +10,11 @@ public class MemoryUserDAO implements UserDao{
     private static final Set<UserData> USER_DATA = new HashSet<>();
 
     @Override
-    public void createUser(RegistrationRequest registrationRequest) throws DataAccessException{
-        String newUsername = registrationRequest.username();
-        try {
-            UserData user = getUser(registrationRequest.username());
+    public void createUser(UserData user) throws DataAccessException{
+        if(USER_DATA.contains(user)) {
             throw new DataAccessException("Error: username already exists");
-        }catch(DataAccessException e){
-            UserData newUser = new UserData(newUsername, registrationRequest.password(), registrationRequest.email());
-            USER_DATA.add(newUser);
         }
-
+        USER_DATA.add(user);
     }
 
     @Override

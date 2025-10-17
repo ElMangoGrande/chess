@@ -1,6 +1,8 @@
 package service;
 
-public class InvalidMoveException extends RuntimeException {
+import dataaccess.DataAccessException;
+
+public class InvalidMoveException extends DataAccessException {
     public InvalidMoveException(String message) {
         super(message);
     }
