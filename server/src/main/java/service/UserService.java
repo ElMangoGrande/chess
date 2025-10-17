@@ -13,12 +13,12 @@ import java.util.UUID;
 
 public class UserService {
 
-    private static UserDao UserDao;
-    private static AuthDao AuthDao;
+    private static UserDao userDao;
+    private static AuthDao authDao;
 
-    public UserService(UserDao passedDao, AuthDao authDao) {
-        UserDao = passedDao;
-        AuthDao = authDao;
+    public UserService(UserDao passedDao, AuthDao passedAuthDao) {
+        userDao = passedDao;
+        authDao = passedAuthDao;
     }
     public  String generateToken() {
         return UUID.randomUUID().toString();
@@ -34,9 +34,9 @@ public class UserService {
         if(registerRequest.email() == null){
             throw new BadMessageException("Error: no email provided");
         }
-        UserDao.createUser(new UserData(registerRequest.username(), registerRequest.password(),registerRequest.email()));
+        userDao.createUser(new UserData(registerRequest.username(), registerRequest.password(),registerRequest.email()));
         AuthData authdata = new AuthData(registerRequest.username(),generateToken());
-        AuthDao.createAuth(authdata);
+        authDao.createAuth(authdata);
         return new RegistrationResult(registerRequest.username(), authdata.authToken());
     }
 
@@ -49,25 +49,25 @@ public class UserService {
             throw new BadMessageException("Error: no password provided");
         }
         //Gets the user
-        UserData user = UserDao.getUser(loginRequest.username());
+        UserData user = userDao.getUser(loginRequest.username());
         if(!loginRequest.password().equals(user.password())){
             throw new UnauthorizedResponse("Error: Invalid credentials");
         }
         //Creates new AuthToken
         AuthData authdata = new AuthData(loginRequest.username(),generateToken());
-        AuthDao.createAuth(authdata);
+        authDao.createAuth(authdata);
         //Returns new loginResult
         return new LoginResult(loginRequest.username(), authdata.authToken());
     }
 
     public void logout(LogoutRequest logoutRequest) throws DataAccessException{
-        AuthData data = AuthDao.getAuth(logoutRequest.authToken());
-        AuthDao.deleteAuth(data);
+        AuthData data = authDao.getAuth(logoutRequest.authToken());
+        authDao.deleteAuth(data);
     }
 
     public void clearUsers(){
-        UserDao.clear();
-        AuthDao.clear();
+        userDao.clear();
+        authDao.clear();
     }
 
 }

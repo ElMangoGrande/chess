@@ -14,14 +14,14 @@ public class PawnCalculator {
         this.startPosition = startPosition;
     }
 
-    public boolean InBounds(int row, int col){
+    public boolean inBounds(int row, int col){
         if(row > 8 || row < 1 || col > 8 || col < 1){
             return false;
         }
         return true;
     }
 
-    public void PromoteMe(ChessPosition newPosition){
+    public void promoteMe(ChessPosition newPosition){
         possibleMoves.add(new ChessMove(startPosition,newPosition, ChessPiece.PieceType.KNIGHT));
         possibleMoves.add(new ChessMove(startPosition,newPosition, ChessPiece.PieceType.QUEEN));
         possibleMoves.add(new ChessMove(startPosition,newPosition, ChessPiece.PieceType.ROOK));
@@ -51,12 +51,12 @@ public class PawnCalculator {
             //check forward move
             int row = startRow + 1;
             int col = startCol;
-            if(InBounds(row,col)) {
+            if(inBounds(row,col)) {
                 ChessPosition newPosition = new ChessPosition(row,col);
                 ChessPiece target = board.getPiece(newPosition);
                 if (target == null) {
                     if(row == 8){
-                        PromoteMe(newPosition);
+                        promoteMe(newPosition);
                     }else {
                         possibleMoves.add(new ChessMove(startPosition, newPosition, null));
                     }
@@ -66,13 +66,13 @@ public class PawnCalculator {
 
            row = startRow + 1;
            col = startCol + 1;
-           if(InBounds(row,col)) {
+           if(inBounds(row,col)) {
                ChessPosition newPosition = new ChessPosition(row,col);
                ChessPiece target = board.getPiece(newPosition);
                if (target != null) {
                    if (target.getTeamColor() != board.getPiece(startPosition).getTeamColor()) {
                        if(row == 8){
-                           PromoteMe(newPosition);
+                           promoteMe(newPosition);
                        }else {
                            possibleMoves.add(new ChessMove(startPosition, newPosition, null));
                        }
@@ -82,13 +82,13 @@ public class PawnCalculator {
            //check left white capture
            row = startRow + 1;
            col = startCol - 1;
-           if(InBounds(row,col)) {
+           if(inBounds(row,col)) {
                ChessPosition newPosition = new ChessPosition(row,col);
                ChessPiece target = board.getPiece(newPosition);
                 if (target != null) {
                     if (target.getTeamColor() != board.getPiece(startPosition).getTeamColor()) {
                         if(row == 8){
-                            PromoteMe(newPosition);
+                            promoteMe(newPosition);
                         }else {
                             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
                         }
@@ -115,12 +115,12 @@ public class PawnCalculator {
             //check forward move
             int row = startRow - 1;
             int col = startCol;
-            if(InBounds(row,col)) {
+            if(inBounds(row,col)) {
                 ChessPosition newPosition = new ChessPosition(row,col);
                 ChessPiece target = board.getPiece(newPosition);
                 if (target == null) {
                     if(row == 1){
-                        PromoteMe(newPosition);
+                        promoteMe(newPosition);
                     }else {
                         possibleMoves.add(new ChessMove(startPosition, newPosition, null));
                     }
@@ -129,13 +129,13 @@ public class PawnCalculator {
             //check right black capture
             row = startRow - 1;
             col = startCol + 1;
-            if(InBounds(row,col)) {
+            if(inBounds(row,col)) {
                 ChessPosition newPosition = new ChessPosition(row,col);
                 ChessPiece target = board.getPiece(newPosition);
                 if (target != null) {
                     if (target.getTeamColor() != board.getPiece(startPosition).getTeamColor()) {
                         if(row == 1){
-                            PromoteMe(newPosition);
+                            promoteMe(newPosition);
                         }else {
                             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
                         }
@@ -145,13 +145,13 @@ public class PawnCalculator {
             //check left black capture
             row = startRow - 1;
             col = startCol - 1;
-            if(InBounds(row,col)) {
+            if(inBounds(row,col)) {
                 ChessPosition newPosition = new ChessPosition(row,col);
                 ChessPiece target = board.getPiece(newPosition);
                 if (target != null) {
                     if (target.getTeamColor() != board.getPiece(startPosition).getTeamColor()) {
                         if(row == 1){
-                            PromoteMe(newPosition);
+                            promoteMe(newPosition);
                         }else {
                             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
                         }

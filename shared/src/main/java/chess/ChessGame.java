@@ -12,19 +12,19 @@ import java.util.Objects;
  */
 public class ChessGame {
     private ChessBoard board;
-    private boolean WhiteTurn;
+    private boolean whiteTurn;
 
     public ChessGame() {
     this.board = new ChessBoard();
     this.board.resetBoard();
-    this.WhiteTurn = true;
+    this.whiteTurn = true;
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        if(WhiteTurn){
+        if(whiteTurn){
             return TeamColor.WHITE;
         }else{
             return TeamColor.BLACK;
@@ -37,7 +37,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        WhiteTurn = team == TeamColor.WHITE;
+        whiteTurn = team == TeamColor.WHITE;
     }
 
     /**
@@ -110,10 +110,10 @@ public class ChessGame {
                 board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
             }
             board.addPiece(move.getStartPosition(),null);
-            WhiteTurn = !WhiteTurn;
+            whiteTurn = !whiteTurn;
 
         }else{
-            WhiteTurn = !WhiteTurn;
+            whiteTurn = !whiteTurn;
             throw new InvalidMoveException("invalid move");
         }
 
@@ -257,11 +257,11 @@ public class ChessGame {
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
-        return WhiteTurn == chessGame.WhiteTurn && Objects.equals(board, chessGame.board);
+        return whiteTurn == chessGame.whiteTurn && Objects.equals(board, chessGame.board);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(board, WhiteTurn);
+        return Objects.hash(board, whiteTurn);
     }
 }

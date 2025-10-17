@@ -32,7 +32,7 @@ class GameServiceTest {
     void listGamesPass() throws DataAccessException, InvalidMoveException {
         gameService.createGame(new CreateGameRequest(authToken,"New Game"));
         ListGamesResult results = gameService.listGames(new ListGamesRequest(authToken));
-        gameService.JoinGame(new JoinGameRequest("WHITE",1,authToken));
+        gameService.joinGame(new JoinGameRequest("WHITE",1,authToken));
         GameData game = results.allGameData().iterator().next();
         assertEquals(1,game.gameID());
         assertEquals("Hyrum",game.whiteUsername());

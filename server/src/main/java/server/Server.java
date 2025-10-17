@@ -20,7 +20,7 @@ import java.util.Map;
 public class Server {
 
     private final Javalin javalin;
-    private static final Gson gson = new Gson();
+    private static final Gson myGson = new Gson();
 
     private static UserService user;
     private static GameService game;
@@ -57,15 +57,15 @@ public class Server {
     }
 
     private static void displayError(Exception e, int errorCode, Context ctx) {
-        String errorJson = gson.toJson(Map.of("message", e.getMessage()));
+        String errorJson = myGson.toJson(Map.of("message", e.getMessage()));
         ctx.status(errorCode).result(errorJson).contentType("application/json");
     }
 
     private static void handleRegister(Context ctx){
         try {
-            RegistrationRequest request = gson.fromJson(ctx.body(), RegistrationRequest.class);
+            RegistrationRequest request = myGson.fromJson(ctx.body(), RegistrationRequest.class);
             RegistrationResult result = user.register(request);
-            String resultJson = gson.toJson(result);
+            String resultJson = myGson.toJson(result);
             ctx.status(200).result(resultJson).contentType("application/json");
         }
         catch (AlreadyTakenException e) {
@@ -81,9 +81,9 @@ public class Server {
 
     private static void handleLogin(Context ctx){
         try {
-            LoginRequest request = gson.fromJson(ctx.body(), LoginRequest.class);
+            LoginRequest request = myGson.fromJson(ctx.body(), LoginRequest.class);
             LoginResult result = user.login(request);
-            String resultJson = gson.toJson(result);
+            String resultJson = myGson.toJson(result);
             ctx.status(200).result(resultJson).contentType("application/json");
         }
         catch (UnauthorizedResponse e) {
@@ -115,7 +115,7 @@ public class Server {
         try {
             ListGamesRequest request = new ListGamesRequest(ctx.header("authorization"));
             ListGamesResult result = game.listGames(request);
-            String resultJson = gson.toJson(result);
+            String resultJson = myGson.toJson(result);
             ctx.status(200).result(resultJson).contentType("application/json");
         }
         catch (UnauthorizedResponse e) {
@@ -128,10 +128,10 @@ public class Server {
 
     private static void handleCreateGame(Context ctx){
         try {
-            CreateGameRequest body = gson.fromJson(ctx.body(), CreateGameRequest.class);
+            CreateGameRequest body = myGson.fromJson(ctx.body(), CreateGameRequest.class);
             CreateGameRequest request = new CreateGameRequest(ctx.header("authorization"),body.gameName());
             CreateGameResult result = game.createGame(request);
-            String resultJson = new Gson().toJson(result);
+            String resultJson = myGson.toJson(result);
             ctx.status(200).result(resultJson).contentType("application/json");
         }
         catch (UnauthorizedResponse e) {
@@ -147,9 +147,9 @@ public class Server {
 
     private static void handleJoinGame(Context ctx){
         try {
-            JoinGameRequest body = gson.fromJson(ctx.body(), JoinGameRequest.class);
+            JoinGameRequest body = myGson.fromJson(ctx.body(), JoinGameRequest.class);
             JoinGameRequest request = new JoinGameRequest(body.playerColor(),body.gameID(),ctx.header("authorization"));
-            game.JoinGame(request);
+            game.joinGame(request);
             ctx.status(200);
         }
         catch (UnauthorizedResponse e) {

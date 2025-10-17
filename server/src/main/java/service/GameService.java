@@ -11,20 +11,20 @@ import java.util.Set;
 
 public class GameService {
 
-    private static GameDao GameDao;
-    private static AuthDao AuthDao;
+    private static GameDao gameDao;
+    private static AuthDao authDao;
 
-    public GameService(GameDao passedGameDao, AuthDao authDao) {
-        GameDao = passedGameDao;
-        AuthDao = authDao;
+    public GameService(GameDao passedGameDao, AuthDao passedAuthDao) {
+        gameDao = passedGameDao;
+        authDao = passedAuthDao;
     }
 
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws DataAccessException{
         Set<GameData> gameDataSet;
         //gets auth token
-        AuthDao.getAuth(listGamesRequest.authToken());
+        authDao.getAuth(listGamesRequest.authToken());
         //trys to get list of games
-        gameDataSet = GameDao.listGames();
+        gameDataSet = gameDao.listGames();
         //returns the set of games
         return new ListGamesResult(gameDataSet);
     }
@@ -34,25 +34,25 @@ public class GameService {
             throw new BadMessageException("Error: no game name given");
         }
         //gets auth token
-        AuthDao.getAuth(createGameRequest.authToken());
+        authDao.getAuth(createGameRequest.authToken());
         //creates a game
-        GameData newGame = GameDao.createGame(createGameRequest.gameName());
+        GameData newGame = gameDao.createGame(createGameRequest.gameName());
         return new CreateGameResult(newGame.gameID());
     }
 
-    public void JoinGame(JoinGameRequest joinGameRequest) throws DataAccessException, InvalidMoveException{
+    public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException, InvalidMoveException{
 
         //gets auth token
-        AuthData authData = AuthDao.getAuth(joinGameRequest.authToken());
+        AuthData authData = authDao.getAuth(joinGameRequest.authToken());
         //gets username
         String username = authData.username();
         //gets the game
-        GameData game = GameDao.getGame(joinGameRequest.gameID());
+        GameData game = gameDao.getGame(joinGameRequest.gameID());
         //updates the game
-        GameDao.updateGame(joinGameRequest.gameID(), joinGameRequest.playerColor(), username, null);
+        gameDao.updateGame(joinGameRequest.gameID(), joinGameRequest.playerColor(), username, null);
     }
 
     public void clearGames(){
-        GameDao.clear();
+        gameDao.clear();
     }
 }

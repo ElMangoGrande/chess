@@ -14,7 +14,7 @@ public class KnightCalculator {
         this.startPosition = startPosition;
     }
 
-    public boolean Checkmove(int row,int col){
+    public boolean checkMove(int row,int col){
         if(col >8 || col < 1 || row> 8 || row < 1){
             return false;
         }
@@ -32,35 +32,35 @@ public class KnightCalculator {
     public List<ChessMove> calculateMoves(){
         int startRow = startPosition.getRow();
         int startCol = startPosition.getColumn();
-        if(Checkmove(startRow + 2, startCol + 1)) {
+        if(checkMove(startRow + 2, startCol + 1)) {
             ChessPosition newPosition = new ChessPosition(startRow + 2, startCol + 1);
             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
         }
-        if(Checkmove(startRow + 2, startCol - 1)) {
+        if(checkMove(startRow + 2, startCol - 1)) {
             ChessPosition newPosition = new ChessPosition(startRow + 2, startCol - 1);
             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
         }
-        if(Checkmove(startRow + 1, startCol + 2)) {
+        if(checkMove(startRow + 1, startCol + 2)) {
             ChessPosition newPosition = new ChessPosition(startRow + 1, startCol + 2);
             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
         }
-        if(Checkmove(startRow + 1, startCol - 2)) {
+        if(checkMove(startRow + 1, startCol - 2)) {
             ChessPosition newPosition = new ChessPosition(startRow + 1, startCol - 2);
             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
         }
-        if(Checkmove(startRow - 2, startCol + 1)) {
+        if(checkMove(startRow - 2, startCol + 1)) {
             ChessPosition newPosition = new ChessPosition(startRow - 2, startCol + 1);
             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
         }
-        if(Checkmove(startRow - 2, startCol - 1)) {
+        if(checkMove(startRow - 2, startCol - 1)) {
             ChessPosition newPosition = new ChessPosition(startRow - 2, startCol - 1);
             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
         }
-        if(Checkmove(startRow - 1, startCol + 2)) {
+        if(checkMove(startRow - 1, startCol + 2)) {
             ChessPosition newPosition = new ChessPosition(startRow - 1, startCol + 2);
             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
         }
-        if(Checkmove(startRow - 1, startCol - 2)) {
+        if(checkMove(startRow - 1, startCol - 2)) {
             ChessPosition newPosition = new ChessPosition(startRow - 1, startCol - 2);
             possibleMoves.add(new ChessMove(startPosition, newPosition, null));
         }
