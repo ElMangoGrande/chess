@@ -29,6 +29,23 @@ public class PawnCalculator {
 
     }
 
+    private void tryCaptureMove(int row, int col, int promotionRow) {
+        if (inBounds(row, col)) {
+            ChessPosition newPosition = new ChessPosition(row, col);
+            ChessPiece target = board.getPiece(newPosition);
+            ChessPiece current = board.getPiece(startPosition);
+
+            if (target != null && target.getTeamColor() != current.getTeamColor()) {
+                if (row == promotionRow) {
+                    promoteMe(newPosition);
+                } else {
+                    possibleMoves.add(new ChessMove(startPosition, newPosition, null));
+                }
+            }
+        }
+    }
+
+
     public List<ChessMove> calculateMoves(){
         int startRow = this.startPosition.getRow();
         int startCol = this.startPosition.getColumn();
@@ -63,38 +80,8 @@ public class PawnCalculator {
                 }
             }
            //check right white capture
-
-           row = startRow + 1;
-           col = startCol + 1;
-           if(inBounds(row,col)) {
-               ChessPosition newPosition = new ChessPosition(row,col);
-               ChessPiece target = board.getPiece(newPosition);
-               if (target != null) {
-                   if (target.getTeamColor() != board.getPiece(startPosition).getTeamColor()) {
-                       if(row == 8){
-                           promoteMe(newPosition);
-                       }else {
-                           possibleMoves.add(new ChessMove(startPosition, newPosition, null));
-                       }
-                   }
-               }
-           }
-           //check left white capture
-           row = startRow + 1;
-           col = startCol - 1;
-           if(inBounds(row,col)) {
-               ChessPosition newPosition = new ChessPosition(row,col);
-               ChessPiece target = board.getPiece(newPosition);
-                if (target != null) {
-                    if (target.getTeamColor() != board.getPiece(startPosition).getTeamColor()) {
-                        if(row == 8){
-                            promoteMe(newPosition);
-                        }else {
-                            possibleMoves.add(new ChessMove(startPosition, newPosition, null));
-                        }
-                    }
-                }
-            }
+            tryCaptureMove(startRow + 1, startCol + 1, 8); // right capture
+            tryCaptureMove(startRow + 1, startCol - 1, 8); // left capture
 
 
 
@@ -127,37 +114,9 @@ public class PawnCalculator {
                 }
             }
             //check right black capture
-            row = startRow - 1;
-            col = startCol + 1;
-            if(inBounds(row,col)) {
-                ChessPosition newPosition = new ChessPosition(row,col);
-                ChessPiece target = board.getPiece(newPosition);
-                if (target != null) {
-                    if (target.getTeamColor() != board.getPiece(startPosition).getTeamColor()) {
-                        if(row == 1){
-                            promoteMe(newPosition);
-                        }else {
-                            possibleMoves.add(new ChessMove(startPosition, newPosition, null));
-                        }
-                    }
-                }
-            }
-            //check left black capture
-            row = startRow - 1;
-            col = startCol - 1;
-            if(inBounds(row,col)) {
-                ChessPosition newPosition = new ChessPosition(row,col);
-                ChessPiece target = board.getPiece(newPosition);
-                if (target != null) {
-                    if (target.getTeamColor() != board.getPiece(startPosition).getTeamColor()) {
-                        if(row == 1){
-                            promoteMe(newPosition);
-                        }else {
-                            possibleMoves.add(new ChessMove(startPosition, newPosition, null));
-                        }
-                    }
-                }
-            }
+            tryCaptureMove(startRow - 1, startCol + 1, 1); // right capture
+            tryCaptureMove(startRow - 1, startCol - 1, 1); // left capture
+
         }
 
         //promotion(if needed)
