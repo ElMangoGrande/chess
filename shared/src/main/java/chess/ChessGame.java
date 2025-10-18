@@ -169,7 +169,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         //checks to see that a team is in check
-        if (!isInCheck(teamColor)) return false;
+        if (!isInCheck(teamColor)){ return false;}
 
         // Go through all pieces
         for (int row = 1; row <= 8; row++) {
@@ -194,7 +194,7 @@ public class ChessGame {
                     this.board = oldBoard;
 
                     // If any move gets us out of check, it's not checkmate
-                    if (!stillInCheck) return false;
+                    if (!stillInCheck){ return false;}
                 }
             }
         }
