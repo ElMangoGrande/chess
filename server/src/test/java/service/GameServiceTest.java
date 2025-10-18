@@ -29,6 +29,11 @@ class GameServiceTest {
         authToken = userService.register(registrationRequest).authToken();
     }
 
+    @BeforeEach
+    void clearGamesBeforeTest() throws DataAccessException {
+        gameService.clearGames();
+    }
+
     @Test
     void listGamesPass() throws DataAccessException, InvalidMoveException {
         gameService.createGame(new CreateGameRequest(authToken,"New Game"));
@@ -63,7 +68,7 @@ class GameServiceTest {
 
     @Test
     void joinGamePass() throws DataAccessException, InvalidMoveException {
-        RegistrationRequest registrationRequest = new RegistrationRequest("Chris","25565","business@gmail.com");
+        RegistrationRequest registrationRequest = new RegistrationRequest("ChristopherRobin","25565","business@gmail.com");
         String authToken2 = userService.register(registrationRequest).authToken();
         CreateGameResult game1 = gameService.createGame(new CreateGameRequest(authToken,"New Game"));
         JoinGameRequest request = new JoinGameRequest("WHITE",1,authToken);
@@ -73,12 +78,12 @@ class GameServiceTest {
         ListGamesResult results = gameService.listGames(new ListGamesRequest(authToken));
         GameData game = results.games().iterator().next();
         assertEquals("Hyrum",game.whiteUsername());
-        assertEquals("Chris",game.blackUsername());
+        assertEquals("ChristopherRobin",game.blackUsername());
     }
 
     @Test
     void joinGameFail() throws DataAccessException, InvalidMoveException {
-        RegistrationRequest registrationRequest = new RegistrationRequest("Chris","25565","business@gmail.com");
+        RegistrationRequest registrationRequest = new RegistrationRequest("Christopher","25565","business@gmail.com");
         String authToken2 = userService.register(registrationRequest).authToken();
         CreateGameResult game1 = gameService.createGame(new CreateGameRequest(authToken,"New Game"));
         JoinGameRequest request = new JoinGameRequest("WHITE",1,authToken);
