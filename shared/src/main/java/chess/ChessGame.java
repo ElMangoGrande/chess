@@ -148,16 +148,15 @@ public class ChessGame {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                if (piece != null && piece.getTeamColor() == opponent) {
-                    for (ChessMove move : piece.pieceMoves(board, new ChessPosition(row, col))) {
-                        if (move.getEndPosition().equals(kingPosition)) {
-                            return true;
+                if (piece == null || piece.getTeamColor() != opponent) continue;
+                for (ChessMove move : piece.pieceMoves(board, new ChessPosition(row, col))) {
+                    if (move.getEndPosition().equals(kingPosition)) {
+                        return true;
                         }
                     }
-                }
+
             }
         }
-
         //if any pieces can get to where the king is, then we are in check
     return false;
     }
@@ -177,8 +176,8 @@ public class ChessGame {
                     //checks for pieces on the same team
                     ChessPosition newPos = new ChessPosition(row,col);
                     ChessPiece newPiece =board.getPiece(newPos);
-                    if(newPiece != null && newPiece.getTeamColor() == teamColor){
-                        Collection<ChessMove> valids = validMoves(newPos);
+                    if(newPiece == null || newPiece.getTeamColor() != teamColor)continue;
+                    Collection<ChessMove> valids = validMoves(newPos);
                         //checks each future hypothetical move
                         for(ChessMove move: valids){
                             // simulate on a copy board
@@ -197,7 +196,7 @@ public class ChessGame {
                                     return false;
                                 }
                             }
-                        }
+
                     }
                 }
             return true;
