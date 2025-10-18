@@ -34,7 +34,4 @@ class UserServiceTest {
     void clearUsersPass() {
     }
 
-    @Test
-    void clearUsersFail() {
-    }
 }

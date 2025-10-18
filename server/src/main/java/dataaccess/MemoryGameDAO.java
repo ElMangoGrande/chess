@@ -47,7 +47,7 @@ public class MemoryGameDAO implements GameDao{
         if(color != null && username != null){
             if(color.equals("WHITE")){
                 if(game.whiteUsername() != null){
-                    throw new AlreadyTakenException("Error: Username already taken");
+                    throw new AlreadyTakenException("Error: Team already taken");
                 }
                 GameData updateGame = new GameData(gameID,username,game.blackUsername(),game.gameName(),game.game());
                 GAME_DATA.remove(game);
@@ -56,7 +56,7 @@ public class MemoryGameDAO implements GameDao{
             }
             else if(color.equals("BLACK")){
                 if(game.blackUsername() != null){
-                    throw new AlreadyTakenException("Error: Username already taken");
+                    throw new AlreadyTakenException("Error: Team already taken");
                 }
                 GameData updateGame = new GameData(gameID,game.whiteUsername(),username,game.gameName(),game.game());
                 GAME_DATA.remove(game);
