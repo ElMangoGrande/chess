@@ -77,8 +77,14 @@ class GameServiceTest {
     }
 
     @Test
-    void joinGameFail() {
-
+    void joinGameFail() throws DataAccessException, InvalidMoveException {
+        RegistrationRequest registrationRequest = new RegistrationRequest("Chris","25565","business@gmail.com");
+        String authToken2 = userService.register(registrationRequest).authToken();
+        CreateGameResult game1 = gameService.createGame(new CreateGameRequest(authToken,"New Game"));
+        JoinGameRequest request = new JoinGameRequest("WHITE",1,authToken);
+        JoinGameRequest request2 = new JoinGameRequest("WHITE",1,authToken2);
+        gameService.joinGame(request);
+        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(request2));
     }
 
     @Test
