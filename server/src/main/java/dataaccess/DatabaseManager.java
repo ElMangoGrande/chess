@@ -116,7 +116,7 @@ public class DatabaseManager {
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
     }
 
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+    public static int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
