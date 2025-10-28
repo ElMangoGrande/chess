@@ -3,6 +3,9 @@ package dataaccess;
 import java.sql.*;
 import java.util.Properties;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.sql.Types.NULL;
+
 public class DatabaseManager {
     private static String databaseName;
     private static String dbUsername;
@@ -16,6 +19,34 @@ public class DatabaseManager {
         loadPropertiesFromResources();
     }
 
+    private static final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS  UserData (
+              username varchar(255) NOT NULL,
+              password varchar(255) NOT NULL,
+              email varchar(255) NOT NULL,
+              PRIMARY KEY (username)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  GameData (
+              gameID INT NOT NULL AUTO_INCREMENT,
+              whiteUsername varchar(255),
+              blackUsername varchar(255),
+              gameName varchar(255) NOT NULL,
+              game longtext NOT NULL,
+              PRIMARY KEY (gameID)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  AuthData (
+              authToken varchar(255) NOT NULL,
+              username varchar(255) NOT NULL,
+              PRIMARY KEY (authToken)
+            );
+            """
+    };
+
     /**
      * Creates the database if it does not already exist.
      */
@@ -25,9 +56,19 @@ public class DatabaseManager {
              var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to create database", ex);
+            throw new DataAccessException("Error: failed to create database", ex);
+        }
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String tableStatement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(tableStatement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: SQL tables didn't create");
         }
     }
+
 
     /**
      * Create a connection to the database and sets the catalog based upon the
@@ -73,5 +114,28 @@ public class DatabaseManager {
         var host = props.getProperty("db.host");
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+    }
+
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                    else if (param == null) ps.setNull(i + 1, NULL);
+                }
+                ps.executeUpdate();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: Failed to update SQL database");
+        }
     }
 }
