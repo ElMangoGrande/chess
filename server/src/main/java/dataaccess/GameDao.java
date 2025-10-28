@@ -13,5 +13,5 @@ public interface GameDao {
     GameData getGame(int gameID) throws DataAccessException;
     Set<GameData> listGames() throws DataAccessException;
     void updateGame(int gameID, String color, String username, ChessMove move) throws DataAccessException, InvalidMoveException;
-    void clear();
+    void clear() throws DataAccessException;
 }
