@@ -28,9 +28,9 @@ public class UserSQL implements UserDao{
 
         try (Connection conn = DatabaseManager.getConnection()) {
                 try (var preparedStatement = conn.prepareStatement(selectStatement)) {
+                    preparedStatement.setString(1, username);
                     try(ResultSet rs = preparedStatement.executeQuery()){
                         if(rs.next()){
-                            rs.getString("username");
                             return new UserData(rs.getString("username"),
                                     rs.getString("password"),
                                     rs.getString("email"));
@@ -43,8 +43,8 @@ public class UserSQL implements UserDao{
         } catch (SQLException ex) {
             throw new DataAccessException("Error: SQL tables didn't create");
         }
-
     }
+
     @Override
     public void clear() throws DataAccessException {
             String updateStatement = "TRUNCATE UserData";
