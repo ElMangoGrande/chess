@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.AlreadyTakenException;
 
 import java.sql.Connection;
@@ -14,12 +15,13 @@ public class UserSQL implements UserDao{
     public void createUser(UserData user) throws DataAccessException{
         String username = user.username();
         String password = user.password();
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         String email = user.email();
         if(getUser(username)!= null){
             throw new AlreadyTakenException("Error: username already exists");
         }
             String updateStatement = "INSERT INTO UserData(username,password,email) VALUES(?,?,?)";
-            DatabaseManager.executeUpdate(updateStatement,username,password,email);
+            DatabaseManager.executeUpdate(updateStatement,username,hashedPassword,email);
     }
     @Override
     public UserData getUser(String username) throws DataAccessException{

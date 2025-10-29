@@ -52,7 +52,12 @@ public class GameService {
         gameDao.updateGame(joinGameRequest.gameID(), joinGameRequest.playerColor(), username, null);
     }
 
-    public void clearGames(){
+    //new func
+        //get game
+        //uses checkmove
+        //call update game
+
+    public void clearGames() throws DataAccessException {
         gameDao.clear();
     }
 }

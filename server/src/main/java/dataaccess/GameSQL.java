@@ -6,6 +6,7 @@ import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import org.eclipse.jetty.http.BadMessageException;
 import service.AlreadyTakenException;
 import service.DoesNotExistException;
 
@@ -16,11 +17,16 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class GameSQL implements GameDao{
 
     public GameData createGame(String gameName) throws DataAccessException{
+
+        if(gameName == null){
+            throw new BadMessageException("Error: game name needed");
+        }
         String checkStatement = "SELECT * FROM GameData WHERE gameName = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -37,20 +43,9 @@ public class GameSQL implements GameDao{
             String gameJson = gson.toJson(newChessGame);
 
             String insertStatement = "INSERT INTO GameData (gameName, game) VALUES (?, ?)";
-            try (var insertStmt = conn.prepareStatement(insertStatement, Statement.RETURN_GENERATED_KEYS)) {
-                insertStmt.setString(1, gameName);
-                insertStmt.setString(2, gameJson);
-                insertStmt.executeUpdate();
+            int gameID = DatabaseManager.executeUpdate(insertStatement,gameName,gameJson);
+            return new GameData(gameID,null,null,gameName,newChessGame);
 
-                try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int newGameID = generatedKeys.getInt(1);
-                        return new GameData(newGameID, null, null, gameName, newChessGame);
-                    } else {
-                        throw new DataAccessException("Error: Failed to create new game, no ID obtained.");
-                    }
-                }
-            }
         } catch (SQLException ex) {
             throw new DataAccessException("Error: SQL operation failed", ex);
         }
@@ -73,7 +68,7 @@ public class GameSQL implements GameDao{
                                 chessGame);
                     }
                     else{
-                        return null;
+                        throw new BadMessageException("Error: Bad GetGame Request");
                     }
                 }
             }
@@ -109,8 +104,26 @@ public class GameSQL implements GameDao{
 
     }
     public void updateGame(int gameID, String color, String username, ChessMove move) throws DataAccessException, InvalidMoveException{
-        if(getGame(gameID)== null){
+        GameData game = getGame(gameID);
+
+        if(game== null){
             throw new DoesNotExistException("Error: game does not exist");
+        }
+        //check the move
+
+        //update if valid
+
+        Gson gson = new Gson();
+        String gameJson = gson.toJson(game);
+
+        if(Objects.equals(color, "WHITE")) {
+            String updateStatement = "INSERT INTO GameData(gameID,whiteUsername,blackUsername,gameName,game) VALUES(?,?,?,?,?)";
+            DatabaseManager.executeUpdate(updateStatement,gameID,username,game.blackUsername(),game.gameName(),gameJson);
+        }else if(Objects.equals(color, "BLACK")){
+            String updateStatement = "INSERT INTO GameData(gameID,whiteUsername,blackUsername,gameName,game) VALUES(?,?,?,?,?)";
+            DatabaseManager.executeUpdate(updateStatement,gameID,game.whiteUsername(),username,game.gameName(),gameJson);
+        }else{
+            throw new DataAccessException("Error: invalid team color");
         }
 
     }

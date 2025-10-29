@@ -8,6 +8,7 @@ import model.*;
 import dataaccess.UserDao;
 import dataaccess.AuthDao;
 import org.eclipse.jetty.http.BadMessageException;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
 
@@ -50,9 +51,9 @@ public class UserService {
         }
         //Gets the user
         UserData user = userDao.getUser(loginRequest.username());
-        if(!loginRequest.password().equals(user.password())){
+        if(!BCrypt.checkpw(loginRequest.password(), user.password())){
             throw new UnauthorizedResponse("Error: Invalid credentials");
-        }
+        };
         //Creates new AuthToken
         AuthData authdata = new AuthData(loginRequest.username(),generateToken());
         authDao.createAuth(authdata);
@@ -65,7 +66,7 @@ public class UserService {
         authDao.deleteAuth(data);
     }
 
-    public void clearUsers(){
+    public void clearUsers() throws DataAccessException {
         userDao.clear();
         authDao.clear();
     }

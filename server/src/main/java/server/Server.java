@@ -15,6 +15,8 @@ import service.GameService;
 import service.UserService;
 import chess.InvalidMoveException;
 
+import dataaccess.*;
+
 import java.util.Map;
 
 public class Server {
@@ -27,9 +29,9 @@ public class Server {
 
     public Server() {
         //create daos
-        MemoryUserDAO memoryUserDAO = new MemoryUserDAO();
-        MemoryAuthDAO memoryAuthDAO = new MemoryAuthDAO();
-        MemoryGameDAO memoryGameDAO = new MemoryGameDAO();
+        UserDao memoryUserDAO = new UserSQL();
+        AuthDao memoryAuthDAO = new AuthSQL();
+        GameDao memoryGameDAO = new GameSQL();
 
         //new Services
         user = new UserService(memoryUserDAO,memoryAuthDAO);
@@ -167,7 +169,7 @@ public class Server {
 
     }
 
-    private static void handleClear(Context ctx){
+    private static void handleClear(Context ctx) throws DataAccessException {
             game.clearGames();
             user.clearUsers();
             ctx.status(200);
