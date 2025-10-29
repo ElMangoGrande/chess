@@ -81,7 +81,7 @@ public class GameSQL implements GameDao{
     public Set<GameData> listGames() throws DataAccessException{
         String selectStatement= "SELECT * FROM GameData";
         Gson gson = new Gson();
-        Set<GameData> Games = new HashSet<>();
+        Set<GameData> games = new HashSet<>();
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(selectStatement)) {
                 try(ResultSet rs = preparedStatement.executeQuery()){
@@ -93,9 +93,9 @@ public class GameSQL implements GameDao{
                                 rs.getString("blackUsername"),
                                 rs.getString("gameName"),
                                 chessGame);
-                        Games.add(game);
+                        games.add(game);
                     }
-                    return Games;
+                    return games;
                 }
             }
         } catch (SQLException ex) {
