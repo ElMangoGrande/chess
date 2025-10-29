@@ -110,22 +110,30 @@ public class GameSQL implements GameDao{
             throw new DoesNotExistException("Error: game does not exist");
         }
         //check the move
-
         //update if valid
-
         Gson gson = new Gson();
         String gameJson = gson.toJson(game);
 
-        if(Objects.equals(color, "WHITE")) {
-            String updateStatement = "INSERT INTO GameData(gameID,whiteUsername,blackUsername,gameName,game) VALUES(?,?,?,?,?)";
-            DatabaseManager.executeUpdate(updateStatement,gameID,username,game.blackUsername(),game.gameName(),gameJson);
-        }else if(Objects.equals(color, "BLACK")){
-            String updateStatement = "INSERT INTO GameData(gameID,whiteUsername,blackUsername,gameName,game) VALUES(?,?,?,?,?)";
-            DatabaseManager.executeUpdate(updateStatement,gameID,game.whiteUsername(),username,game.gameName(),gameJson);
-        }else{
-            throw new DataAccessException("Error: invalid team color");
+        if(username == null || color == null){
+            throw new BadMessageException("Error: bad update game request");
         }
-
+        if(color.equals("WHITE")) {
+            if(game.whiteUsername() == null) {
+                String updateStatement = "UPDATE GameData SET whiteUsername = ? WHERE gameID = ?";
+                DatabaseManager.executeUpdate(updateStatement,username,gameID);
+            }else{
+                throw new AlreadyTakenException("Error: white player taken");
+            }
+        }else if(color.equals("BLACK")){
+            if(game.blackUsername() == null) {
+                String updateStatement = "UPDATE GameData SET blackUsername = ? WHERE gameID = ?";
+                DatabaseManager.executeUpdate(updateStatement,username,gameID);
+            }else{
+                throw new AlreadyTakenException("Error: black player taken");
+            }
+        }else{
+            throw new BadMessageException("Error: invalid team color");
+        }
     }
 
     public void clear() throws DataAccessException {

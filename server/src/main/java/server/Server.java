@@ -33,6 +33,13 @@ public class Server {
         AuthDao memoryAuthDAO = new AuthSQL();
         GameDao memoryGameDAO = new GameSQL();
 
+        //start database
+        try{
+            DatabaseManager.createDatabase();
+        }catch (DataAccessException e){
+            System.out.println(e.getMessage());
+        }
+
         //new Services
         user = new UserService(memoryUserDAO,memoryAuthDAO);
         game = new GameService(memoryGameDAO,memoryAuthDAO);
@@ -169,10 +176,15 @@ public class Server {
 
     }
 
-    private static void handleClear(Context ctx) throws DataAccessException {
-            game.clearGames();
-            user.clearUsers();
-            ctx.status(200);
+    private static void handleClear(Context ctx)  {
+           try {
+               game.clearGames();
+               user.clearUsers();
+               ctx.status(200);
+           }catch (DataAccessException e){
+               displayError(e,500,ctx);
+           }
+
 
     }
 

@@ -4,6 +4,7 @@ import dataaccess.DataAccessException;
 import chess.InvalidMoveException;
 import dataaccess.GameDao;
 import dataaccess.AuthDao;
+import io.javalin.http.UnauthorizedResponse;
 import model.*;
 import org.eclipse.jetty.http.BadMessageException;
 
@@ -22,7 +23,10 @@ public class GameService {
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws DataAccessException{
         Set<GameData> gameDataSet;
         //gets auth token
-        authDao.getAuth(listGamesRequest.authToken());
+        AuthData authData = authDao.getAuth(listGamesRequest.authToken());
+        if(authData == null){
+            throw new UnauthorizedResponse("Error: there is no authData");
+        }
         //trys to get list of games
         gameDataSet = gameDao.listGames();
         //returns the set of games
@@ -34,7 +38,9 @@ public class GameService {
             throw new BadMessageException("Error: no game name given");
         }
         //gets auth token
-        authDao.getAuth(createGameRequest.authToken());
+        if(authDao.getAuth(createGameRequest.authToken()) == null){
+            throw new UnauthorizedResponse("Error: no auth");
+        }
         //creates a game
         GameData newGame = gameDao.createGame(createGameRequest.gameName());
         return new CreateGameResult(newGame.gameID());
@@ -44,6 +50,9 @@ public class GameService {
 
         //gets auth token
         AuthData authData = authDao.getAuth(joinGameRequest.authToken());
+        if(authData == null){
+            throw new UnauthorizedResponse("Error: there is no authData");
+        }
         //gets username
         String username = authData.username();
         //gets the game

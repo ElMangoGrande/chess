@@ -51,6 +51,9 @@ public class UserService {
         }
         //Gets the user
         UserData user = userDao.getUser(loginRequest.username());
+        if(user == null){
+            throw new UnauthorizedResponse("Error: invalid credentials");
+        }
         if(!BCrypt.checkpw(loginRequest.password(), user.password())){
             throw new UnauthorizedResponse("Error: Invalid credentials");
         };

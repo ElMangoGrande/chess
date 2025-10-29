@@ -1,5 +1,6 @@
 package dataaccess;
 
+import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
 import model.UserData;
 import service.AlreadyTakenException;
@@ -46,9 +47,12 @@ public class AuthSQL implements AuthDao{
     @Override
     public void deleteAuth(AuthData auth) throws DataAccessException{
         String deleteStatement = "DELETE FROM AuthData WHERE authToken = ?";
-
+        if(auth == null){
+            throw new UnauthorizedResponse("Error: no auth provided");
+        }
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(deleteStatement)) {
+
                 preparedStatement.setString(1, auth.authToken());
                 int rowsAffected = preparedStatement.executeUpdate();
 
