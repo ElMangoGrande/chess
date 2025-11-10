@@ -20,21 +20,52 @@ public class ServerFacade {
 
     public ServerFacade(String url){ServerUrl=url;}
 
-    public RegistrationResult register(RegistrationRequest result){
-
+    public RegistrationResult register(RegistrationRequest registrationrequest) throws ResponseException{
+        var request = buildRequest("POST", "/user", registrationrequest);
+        var response = sendRequest(request);
+        return handleResponse(response, RegistrationResult.class);
     }
 
-    public LoginResult login(LoginRequest request){
-
+    public LoginResult login(LoginRequest requestLogin) throws ResponseException{
+        var request = buildRequest("POST", "/session", requestLogin);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResult.class);
     }
 
-    public void joinGame(JoinGameRequest request){
-
+    public void logout(LogoutRequest requestLogout) throws ResponseException{
+        var request = buildRequest("DELETE", "/session", requestLogout);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
+
+    public void joinGame(JoinGameRequest requestJoin) throws ResponseException{
+        var request = buildRequest("PUT", "/game", requestJoin);
+        var response = sendRequest(request);
+        handleResponse(response,null);
+    }
+
+    public CreateGameResult createGame(CreateGameRequest requestGame) throws ResponseException{
+        var request = buildRequest("POST", "/game", requestGame);
+        var response = sendRequest(request);
+        return handleResponse(response, CreateGameResult.class);
+    }
+
+    public ListGamesResult listGames(ListGamesRequest requestList) throws ResponseException{
+        var request = buildRequest("GET", "/game", requestList);
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResult.class);
+    }
+
+    public void clear() throws ResponseException{
+        var request = buildRequest("DELETE","/db",null);
+        var response = sendRequest(request);
+        handleResponse(response,null);
+    }
+
 
     private HttpRequest buildRequest(String method, String path, Object body) {
         var request = HttpRequest.newBuilder()
-                .uri(URI.create(serverUrl + path))
+                .uri(URI.create(ServerUrl + path))
                 .method(method, makeRequestBody(body));
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
@@ -74,6 +105,9 @@ public class ServerFacade {
         }
 
         return null;
+    }
+    private boolean isSuccessful(int status) {
+        return status / 100 == 2;
     }
 
 }
