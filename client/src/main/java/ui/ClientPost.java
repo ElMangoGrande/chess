@@ -4,17 +4,22 @@ import model.*;
 import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
+import static java.lang.Integer.parseInt;
 import static ui.EscapeSequences.*;
 
 public class ClientPost {
 
     private final ServerFacade server;
     private String authToken;
+    private final Map<Integer,Integer> mappyTheMap;
 
     public ClientPost(ServerFacade server) {
         this.server = server;
+        mappyTheMap = new HashMap<>();
     }
 
     public String eval(String input, String auth) {
@@ -47,7 +52,7 @@ public class ClientPost {
     }
 
     private String create(String[] tokens) throws ResponseException {
-        if (tokens.length < 1) {
+        if (tokens.length < 2) {
             return "Usage: create <NAME>";
         }
         var req = new CreateGameRequest(authToken,tokens[1]);
@@ -56,17 +61,21 @@ public class ClientPost {
     }
 
     private void listHelper(Set<GameData> games){
+        mappyTheMap.clear();
+        int gameNum = 1;
         for( GameData game : games){
+            mappyTheMap.put(gameNum,game.gameID());
             System.out.println(
                     "---------------------\n"+
-                    "game" + game.gameID() +"\n" +
+                    "Game" + gameNum +"\n" +
+                            "Game name" + game.gameName() +"\n" +
                             "White user: " + game.whiteUsername() +"\n"
                             + "Black user: " + game.blackUsername() + "\n"
 
                     + "---------------------\n"
 
             );
-
+            gameNum++;
         }
     }
 
@@ -74,7 +83,17 @@ public class ClientPost {
         var req = new ListGamesRequest(authToken);
         ListGamesResult res = server.listGames(req);
         Set<GameData> games = res.games();
+        listHelper(games);
         return "Games have been listed";
+    }
+
+    private String join(String[] tokens) throws ResponseException {
+        if (tokens.length < 2) {
+            return "Usage: join <ID> [WHITE|BLACK]";
+        }
+        var req = new JoinGameRequest(tokens[2].toUpperCase(),parseInt(tokens[1]),authToken);
+        server.joinGame(req);
+        return "joined game";
     }
 
 }
