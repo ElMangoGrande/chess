@@ -4,6 +4,8 @@ import model.*;
 import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
 
+import java.util.Set;
+
 import static ui.EscapeSequences.*;
 
 public class ClientPost {
@@ -53,7 +55,27 @@ public class ClientPost {
         return "created game" + res.gameID();
     }
 
+    private void listHelper(Set<GameData> games){
+        for( GameData game : games){
+            System.out.println(
+                    "---------------------\n"+
+                    "game" + game.gameID() +"\n" +
+                            "White user: " + game.whiteUsername() +"\n"
+                            + "Black user: " + game.blackUsername() + "\n"
 
+                    + "---------------------\n"
+
+            );
+
+        }
+    }
+
+    private String list(String[] tokens) throws ResponseException{
+        var req = new ListGamesRequest(authToken);
+        ListGamesResult res = server.listGames(req);
+        Set<GameData> games = res.games();
+        return "Games have been listed";
+    }
 
 }
 
