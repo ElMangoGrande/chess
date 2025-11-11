@@ -52,7 +52,7 @@ public class ClientPost {
     }
 
     private String create(String[] tokens) throws ResponseException {
-        if (tokens.length < 2) {
+        if (tokens.length < 1) {
             return "Usage: create <NAME>";
         }
         var req = new CreateGameRequest(authToken,tokens[1]);
@@ -94,6 +94,16 @@ public class ClientPost {
         var req = new JoinGameRequest(tokens[2].toUpperCase(),parseInt(tokens[1]),authToken);
         server.joinGame(req);
         return "joined game";
+    }
+
+    private String observe(String[] tokens) throws ResponseException{
+        return "observe";
+    }
+
+    private String logout(String[] tokens) throws ResponseException{
+        var req = new LogoutRequest(authToken);
+        server.logout(req);
+        return "logged out";
     }
 
 }

@@ -87,8 +87,9 @@ public class REPL {
                 state = State.PRELOGIN;
                 return "logged out" + preHelp();
             }
-
-
+            case "observe", "joined game"->{
+                state = State.INGAME;
+            }
 
         }
     }
