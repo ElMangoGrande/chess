@@ -1,4 +1,4 @@
-package Exception;
+package serverhandling;
 
 import com.google.gson.Gson;
 

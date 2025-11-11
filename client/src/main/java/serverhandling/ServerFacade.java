@@ -1,7 +1,6 @@
-package ui;
+package serverhandling;
 
 import com.google.gson.Gson;
-import Exception.ResponseException;
 import model.*;
 import java.net.*;
 import java.net.http.*;
@@ -21,6 +20,7 @@ public class ServerFacade {
     public ServerFacade(String url){ServerUrl=url;}
 
     public RegistrationResult register(RegistrationRequest registrationrequest) throws ResponseException{
+        //
         var request = buildRequest("POST", "/user", registrationrequest);
         var response = sendRequest(request);
         return handleResponse(response, RegistrationResult.class);
@@ -40,14 +40,16 @@ public class ServerFacade {
 
     public void joinGame(JoinGameRequest requestJoin) throws ResponseException{
         var request = buildRequest("PUT", "/game", requestJoin);
+        //adds authtoken as a header
         var response = sendRequest(request);
         handleResponse(response,null);
     }
 
-    public CreateGameResult createGame(CreateGameRequest requestGame) throws ResponseException{
+    public int createGame(CreateGameRequest requestGame) throws ResponseException{
         var request = buildRequest("POST", "/game", requestGame);
         var response = sendRequest(request);
-        return handleResponse(response, CreateGameResult.class);
+        CreateGameResult game = handleResponse(response, CreateGameResult.class);
+        return game.gameID();
     }
 
     public ListGamesResult listGames(ListGamesRequest requestList) throws ResponseException{

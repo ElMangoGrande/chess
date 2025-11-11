@@ -4,17 +4,27 @@ import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
+import serverhandling.ResponseException;
+import serverhandling.ServerFacade;
+import ui.*;
+
 public class REPL {
 
     private ClientGame game;
     private ClientPost post;
     private ClientPre pre;
+    private final ServerFacade server;
+
+    private enum State { PRELOGIN, POSTLOGIN, INGAME }
+    private State state = State.PRELOGIN;
 
 
-    REPL(){
-        game = new ClientGame();
-        post = new ClientPost();
-        pre = new ClientPre();
+    REPL(String serverUrl){
+        this.server = new ServerFacade(serverUrl);
+        game = new ClientGame(server);
+        post = new ClientPost(server);
+        pre = new ClientPre(server);
+
     }
 
     private void printPrompt() {
@@ -23,7 +33,7 @@ public class REPL {
 
     public void run(){
         System.out.println("Welcome to Chess. Type help or else");
-        System.out.print(ClientPre.help());
+        System.out.print(ClientPre.preHelp());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -32,11 +42,29 @@ public class REPL {
             printPrompt();
             String line = scanner.nextLine();
 
-            //call eval for pre
-            //analyze return on eval from pre
-            //move onto next loop if you should, else stay in loop
+            try {
+                result = eval(line);
+                System.out.print(SET_TEXT_COLOR_WHITE + result);
+            } catch (ResponseException e) {
+                System.out.print(SET_TEXT_COLOR_RED + e.getMessage());
+            } catch (Throwable e) {
+                System.out.print(SET_TEXT_COLOR_RED + "Error: " + e.getMessage());
+            }
 
         }
+    }
 
+    public String eval(String input) throws ResponseException {
+        input = input.trim();
+        if(input.isEmpty()){
+            return "";
+        }
+
+        String result;
+
+        //switch state
+        switch()
+
+        //switch for result
     }
 }
