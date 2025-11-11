@@ -1,7 +1,9 @@
 package ui;
 
+import java.util.Locale;
 import java.util.Scanner;
 
+import static ui.ClientPre.preHelp;
 import static ui.EscapeSequences.*;
 
 import serverhandling.ResponseException;
@@ -33,7 +35,7 @@ public class REPL {
 
     public void run(){
         System.out.println("Welcome to Chess. Type help or else");
-        System.out.print(ClientPre.preHelp());
+        System.out.print(preHelp());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -63,8 +65,26 @@ public class REPL {
         String result;
 
         //switch state
-        switch()
+        switch(state){
+            case PRELOGIN -> result = pre.eval(input);
+            case POSTLOGIN -> result = post.eval(input);
+            case INGAME -> result = game.eval(input);
+            default -> result = "Invalid state.";
+        }
 
         //switch for result
+        switch(result.toLowerCase()){
+            case "login successful" ->{
+                state = State.POSTLOGIN;
+                return "login sucessful" + post.help();
+            }
+            case "logout"->{
+                state = State.PRELOGIN;
+                return "logged out" + preHelp();
+            }
+
+
+
+        }
     }
 }

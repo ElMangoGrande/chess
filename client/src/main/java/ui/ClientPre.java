@@ -2,14 +2,17 @@ package ui;
 
 import java.util.Arrays;
 
-import model.RegistrationRequest;
-import model.RegistrationResult;
+import model.*;
 import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
+
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class ClientPre {
 
     private final ServerFacade server;
+    private String authToken;
 
     public ClientPre(ServerFacade server) {
         this.server = server;
@@ -21,8 +24,8 @@ public class ClientPre {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
 
             return switch (cmd) {
-                case "login" -> login(params);
-                case "register" -> register(params);
+                case "login" -> login(tokens);
+                case "register" -> register(tokens);
                 case "quit" -> "quit";
                 default -> preHelp();
             };
@@ -32,25 +35,34 @@ public class ClientPre {
     }
 
     public static String preHelp() {
-        return """
-                - register <USERNAME> <PASSWORD> <EMAIL>
-                - login <USERNAME> <PASSWORD>
-                - quit
-                -help
-                """;
+        return SET_TEXT_COLOR_BLUE +"register <USERNAME> <PASSWORD> <EMAIL>"
+                + RESET_TEXT_COLOR + " - to create an account\n" +
+                SET_TEXT_COLOR_BLUE +"login <USERNAME> <PASSWORD>"
+                + RESET_TEXT_COLOR +" - to play chess\n"
+                + SET_TEXT_COLOR_BLUE+"quit" + RESET_TEXT_COLOR+ " - playing chess\n" +
+                SET_TEXT_COLOR_BLUE+"help" + RESET_TEXT_COLOR +"lists possible commands\n";
     }
 
     private String register(String[] tokens) throws ResponseException {
         if (tokens.length < 3) {
-            return "Usage: register <username> <password>";
+            return "Usage: register <username> <password> <email>";
         }
-        var req = new RegistrationRequest(tokens[1], tokens[2]);
+        var req = new RegistrationRequest(tokens[1], tokens[2], tokens[3]);
         RegistrationResult res = server.register(req);
         return "Registered new user: " + res.username();
     }
 
     private String login(String[] tokens) throws ResponseException{
-        if(tokens.length)
+        if(tokens.length <3){
+            return "Usage: register <username> <password>";
+        }
+        var req = new LoginRequest(tokens[1], tokens[2]);
+        LoginResult res = server.login(req);
+        return "login successful";
+    }
+
+    public String getAuthToken() {
+        return authToken;
     }
 
 }

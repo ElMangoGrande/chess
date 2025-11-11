@@ -20,7 +20,6 @@ public class ServerFacade {
     public ServerFacade(String url){ServerUrl=url;}
 
     public RegistrationResult register(RegistrationRequest registrationrequest) throws ResponseException{
-        //
         var request = buildRequest("POST", "/user", registrationrequest);
         var response = sendRequest(request);
         return handleResponse(response, RegistrationResult.class);
@@ -40,7 +39,6 @@ public class ServerFacade {
 
     public void joinGame(JoinGameRequest requestJoin) throws ResponseException{
         var request = buildRequest("PUT", "/game", requestJoin);
-        //adds authtoken as a header
         var response = sendRequest(request);
         handleResponse(response,null);
     }
