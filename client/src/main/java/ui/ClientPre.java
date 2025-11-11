@@ -20,9 +20,9 @@ public class ClientPre {
 
     public String eval(String input) {
         try {
-            String[] tokens = input.toLowerCase().split(" ");
+            String[] tokens = input.split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
-
+            cmd = cmd.toLowerCase();
             return switch (cmd) {
                 case "login" -> login(tokens);
                 case "register" -> register(tokens);
@@ -49,15 +49,17 @@ public class ClientPre {
         }
         var req = new RegistrationRequest(tokens[1], tokens[2], tokens[3]);
         RegistrationResult res = server.register(req);
-        return "Registered new user: " + res.username();
+        authToken = res.authToken();
+        return "registered";
     }
 
     private String login(String[] tokens) throws ResponseException{
-        if(tokens.length <3){
-            return "Usage: register <username> <password>";
+        if(tokens.length <2){
+            return "Usage: login <username> <password>";
         }
         var req = new LoginRequest(tokens[1], tokens[2]);
         LoginResult res = server.login(req);
+        authToken = res.authToken();
         return "login successful";
     }
 

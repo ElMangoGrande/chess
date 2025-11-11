@@ -43,11 +43,10 @@ public class ServerFacade {
         handleResponse(response,null);
     }
 
-    public int createGame(CreateGameRequest requestGame) throws ResponseException{
+    public CreateGameResult createGame(CreateGameRequest requestGame) throws ResponseException{
         var request = buildRequest("POST", "/game", requestGame, requestGame.authToken());
         var response = sendRequest(request);
-        CreateGameResult game = handleResponse(response, CreateGameResult.class);
-        return game.gameID();
+        return handleResponse(response, CreateGameResult.class);
     }
 
     public ListGamesResult listGames(ListGamesRequest requestList) throws ResponseException{

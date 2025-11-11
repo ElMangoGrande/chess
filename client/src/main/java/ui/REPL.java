@@ -19,7 +19,7 @@ public class REPL {
 
     private enum State { PRELOGIN, POSTLOGIN, INGAME }
     private State state = State.PRELOGIN;
-
+    private String authToken;
 
     REPL(String serverUrl){
         this.server = new ServerFacade(serverUrl);
@@ -66,8 +66,13 @@ public class REPL {
 
         //switch state
         switch(state){
-            case PRELOGIN -> result = pre.eval(input);
-            case POSTLOGIN -> result = post.eval(input);
+            case PRELOGIN -> {
+                result = pre.eval(input);
+                if(result.equals("registered") || result.equals("login successful")){
+                    authToken = pre.getAuthToken();
+                }
+            }
+            case POSTLOGIN -> result = post.eval(input,authToken);
             case INGAME -> result = game.eval(input);
             default -> result = "Invalid state.";
         }
@@ -76,7 +81,7 @@ public class REPL {
         switch(result.toLowerCase()){
             case "login successful" ->{
                 state = State.POSTLOGIN;
-                return "login sucessful" + post.help();
+                return "login successful" + post.help();
             }
             case "logout"->{
                 state = State.PRELOGIN;
