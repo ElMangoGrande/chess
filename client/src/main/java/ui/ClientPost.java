@@ -35,13 +35,13 @@ public class ClientPost {
                 case "observe" -> observe(tokens);
                 case "logout" -> logout(tokens);
                 case "quit" -> "quit";
-                default -> preHelp();
+                default -> postHelp();
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
         }
     }
-    public static String help() {
+    public static String postHelp() {
         return SET_TEXT_COLOR_BLUE +"create <NAME>" + RESET_TEXT_COLOR + "- a game\n" +
                  SET_TEXT_COLOR_BLUE +"list" + RESET_TEXT_COLOR +"- games\n" +
                 SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]" + RESET_TEXT_COLOR + "- a game\n"

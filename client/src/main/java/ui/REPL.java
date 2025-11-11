@@ -3,6 +3,7 @@ package ui;
 import java.util.Locale;
 import java.util.Scanner;
 
+import static ui.ClientPost.postHelp;
 import static ui.ClientPre.preHelp;
 import static ui.EscapeSequences.*;
 
@@ -81,7 +82,7 @@ public class REPL {
         switch(result.toLowerCase()){
             case "login successful" ->{
                 state = State.POSTLOGIN;
-                return "login successful" + post.help();
+                return "login successful" + postHelp();
             }
             case "logout"->{
                 state = State.PRELOGIN;
