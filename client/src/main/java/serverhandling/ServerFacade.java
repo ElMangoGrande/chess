@@ -87,19 +87,14 @@ public class ServerFacade {
         try {
             return client.send(request, BodyHandlers.ofString());
         } catch (Exception ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
+            throw new ResponseException(ex.getMessage());
         }
     }
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
         var status = response.statusCode();
         if (!isSuccessful(status)) {
-            var body = response.body();
-            if (body != null) {
-                throw ResponseException.fromJson(body);
-            }
-
-            throw new ResponseException(ResponseException.fromHttpStatusCode(status), "other failure: " + status);
+            throw new ResponseException(ResponseException.statusCode(status));
         }
 
         if (responseClass != null) {

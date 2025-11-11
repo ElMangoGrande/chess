@@ -42,20 +42,20 @@ public class ClientPost {
         }
     }
     public static String postHelp() {
-        return SET_TEXT_COLOR_BLUE +"create <NAME>" + RESET_TEXT_COLOR + "- a game\n" +
-                 SET_TEXT_COLOR_BLUE +"list" + RESET_TEXT_COLOR +"- games\n" +
-                SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]" + RESET_TEXT_COLOR + "- a game\n"
-                +SET_TEXT_COLOR_BLUE + "observe <ID>"+ RESET_TEXT_COLOR + "- a game\n"
-                + SET_TEXT_COLOR_BLUE+"logout" + RESET_TEXT_COLOR+ "When you are done\n"
+        return SET_TEXT_COLOR_BLUE +"create <NAME>" + RESET_TEXT_COLOR + " - a game\n" +
+                 SET_TEXT_COLOR_BLUE +"list" + RESET_TEXT_COLOR +" - games\n" +
+                SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]" + RESET_TEXT_COLOR + " - a game\n"
+                +SET_TEXT_COLOR_BLUE + "observe <ID>"+ RESET_TEXT_COLOR + " - a game\n"
+                + SET_TEXT_COLOR_BLUE+"logout" + RESET_TEXT_COLOR+ " - When you are done\n"
                 + SET_TEXT_COLOR_BLUE+"quit" + RESET_TEXT_COLOR+ " - playing chess\n" +
-                SET_TEXT_COLOR_BLUE+"help" + RESET_TEXT_COLOR +"lists possible commands\n";
+                SET_TEXT_COLOR_BLUE+"help" + RESET_TEXT_COLOR +" - lists possible commands\n";
     }
 
     private String create(String[] tokens) throws ResponseException {
         if (tokens.length < 1) {
             return "Usage: create <NAME>";
         }
-        var req = new CreateGameRequest(authToken,tokens[1]);
+        var req = new CreateGameRequest(authToken,tokens[0]);
         CreateGameResult res = server.createGame(req);
         return "created game" + res.gameID();
     }

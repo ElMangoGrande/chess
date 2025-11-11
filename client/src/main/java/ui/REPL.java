@@ -22,7 +22,7 @@ public class REPL {
     private State state = State.PRELOGIN;
     private String authToken;
 
-    REPL(String serverUrl){
+    public REPL(String serverUrl){
         this.server = new ServerFacade(serverUrl);
         game = new ClientGame(server);
         post = new ClientPost(server);
@@ -58,6 +58,9 @@ public class REPL {
     }
 
     public String eval(String input) throws ResponseException {
+        if (input.equalsIgnoreCase("quit")) {
+            return "quit";
+        }
         input = input.trim();
         if(input.isEmpty()){
             return "";
@@ -82,14 +85,22 @@ public class REPL {
         switch(result.toLowerCase()){
             case "login successful" ->{
                 state = State.POSTLOGIN;
-                return "login successful" + postHelp();
+                return "login successful.\n" + postHelp();
+            }
+            case "registered" -> {
+                state = State.POSTLOGIN;
+                return "Registration successful.\n" + postHelp();
             }
             case "logout"->{
                 state = State.PRELOGIN;
-                return "logged out" + preHelp();
+                return "logged out. \n" + preHelp();
             }
             case "observe", "joined game"->{
                 state = State.INGAME;
+                return "entering game...";
+            }
+            default ->{
+                return result;
             }
 
         }

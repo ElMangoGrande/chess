@@ -40,7 +40,7 @@ public class ClientPre {
                 SET_TEXT_COLOR_BLUE +"login <USERNAME> <PASSWORD>"
                 + RESET_TEXT_COLOR +" - to play chess\n"
                 + SET_TEXT_COLOR_BLUE+"quit" + RESET_TEXT_COLOR+ " - playing chess\n" +
-                SET_TEXT_COLOR_BLUE+"help" + RESET_TEXT_COLOR +"lists possible commands\n";
+                SET_TEXT_COLOR_BLUE+"help" + RESET_TEXT_COLOR +" - lists possible commands\n";
     }
 
     private String register(String[] tokens) throws ResponseException {
