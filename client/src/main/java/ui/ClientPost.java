@@ -4,6 +4,7 @@ import model.*;
 import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,7 @@ public class ClientPost {
     private final ServerFacade server;
     private String authToken;
     private final Map<Integer,Integer> mappyTheMap;
+    private Boolean teamColor;
 
     public ClientPost(ServerFacade server) {
         this.server = server;
@@ -27,13 +29,14 @@ public class ClientPost {
         try {
             String[] tokens = input.toLowerCase().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
+            String[] params = Arrays.copyOfRange(tokens,1,tokens.length);
 
             return switch (cmd) {
-                case "create" -> create(tokens);
-                case "list" -> list(tokens);
-                case "join" -> join(tokens);
-                case "observe" -> observe(tokens);
-                case "logout" -> logout(tokens);
+                case "create" -> create(params);
+                case "list" -> list(params);
+                case "join" -> join(params);
+                case "observe" -> observe(params);
+                case "logout" -> logout(params);
                 case "quit" -> "quit";
                 default -> postHelp();
             };
@@ -52,7 +55,7 @@ public class ClientPost {
     }
 
     private String create(String[] tokens) throws ResponseException {
-        if (tokens.length < 1) {
+        if (tokens.length != 1) {
             return "Usage: create <NAME>";
         }
         var req = new CreateGameRequest(authToken,tokens[0]);
@@ -68,7 +71,7 @@ public class ClientPost {
             System.out.println(
                     "---------------------\n"+
                     "Game" + gameNum +"\n" +
-                            "Game name" + game.gameName() +"\n" +
+                            "Game name : " + game.gameName() +"\n" +
                             "White user: " + game.whiteUsername() +"\n"
                             + "Black user: " + game.blackUsername() + "\n"
 
@@ -80,6 +83,9 @@ public class ClientPost {
     }
 
     private String list(String[] tokens) throws ResponseException{
+        if(tokens.length != 0){
+            return "Usage: list";
+        }
         var req = new ListGamesRequest(authToken);
         ListGamesResult res = server.listGames(req);
         Set<GameData> games = res.games();
@@ -88,15 +94,33 @@ public class ClientPost {
     }
 
     private String join(String[] tokens) throws ResponseException {
-        if (tokens.length < 2) {
+        if (tokens.length != 2) {
             return "Usage: join <ID> [WHITE|BLACK]";
         }
-        var req = new JoinGameRequest(tokens[2].toUpperCase(),parseInt(tokens[1]),authToken);
+        if(tokens[1].equalsIgnoreCase("WHITE")){
+            teamColor = true;
+        }else{
+            teamColor = false;
+        }
+        int realID;
+        if(tokens[0].matches("-?\\d+")){
+            int gameID = parseInt(tokens[0]);
+            try{
+                realID= mappyTheMap.get(gameID);
+            }catch(NullPointerException e){
+                return "Error:invalid game ID";
+            }
+        }else{
+            return "Error: GameID must be number";
+        }
+
+        var req = new JoinGameRequest(tokens[1].toUpperCase(),realID,authToken);
         server.joinGame(req);
         return "joined game";
     }
 
     private String observe(String[] tokens) throws ResponseException{
+        teamColor = true;
         return "observe";
     }
 
@@ -104,6 +128,10 @@ public class ClientPost {
         var req = new LogoutRequest(authToken);
         server.logout(req);
         return "logged out";
+    }
+
+    public Boolean getColor(){
+        return teamColor;
     }
 
 }

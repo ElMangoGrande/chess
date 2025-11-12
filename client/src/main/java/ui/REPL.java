@@ -5,8 +5,10 @@ import java.util.Scanner;
 
 import static ui.ClientPost.postHelp;
 import static ui.ClientPre.preHelp;
+import static ui.DrawBoard.drawBoard;
 import static ui.EscapeSequences.*;
 
+import chess.ChessGame;
 import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
 import ui.*;
@@ -21,6 +23,7 @@ public class REPL {
     private enum State { PRELOGIN, POSTLOGIN, INGAME }
     private State state = State.PRELOGIN;
     private String authToken;
+    private Boolean teamColor;
 
     public REPL(String serverUrl){
         this.server = new ServerFacade(serverUrl);
@@ -91,13 +94,18 @@ public class REPL {
                 state = State.POSTLOGIN;
                 return "Registration successful.\n" + postHelp();
             }
-            case "logout"->{
+            case "logged out"->{
                 state = State.PRELOGIN;
                 return "logged out. \n" + preHelp();
             }
             case "observe", "joined game"->{
                 state = State.INGAME;
+                drawBoard(post.getColor(),new ChessGame().getBoard().getTiles());
                 return "entering game...";
+            }
+            case "exit"->{
+                state = State.POSTLOGIN;
+                return "leaving Game \n" + postHelp();
             }
             default ->{
                 return result;
