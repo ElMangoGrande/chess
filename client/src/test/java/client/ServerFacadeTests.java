@@ -122,8 +122,8 @@ public class ServerFacadeTests {
     @Test
     void listGames() throws ResponseException{
         facade.clear();
-        facade.register(new RegistrationRequest("Chris","420","G"));
-        LoginResult res = facade.login(new LoginRequest("Chris","420"));
+        facade.register(new RegistrationRequest("Christopher","420","G"));
+        LoginResult res = facade.login(new LoginRequest("Christopher","420"));
         facade.createGame(new CreateGameRequest(res.authToken(),"Game"));
         ListGamesResult res2 = facade.listGames(new ListGamesRequest(res.authToken()));
         assertNotEquals(null, res2);
