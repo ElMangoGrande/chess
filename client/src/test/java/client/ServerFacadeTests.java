@@ -7,14 +7,17 @@ import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
 import service.AlreadyTakenException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade facade;
+
 
     @BeforeAll
     public static void init() {
@@ -99,21 +102,49 @@ public class ServerFacadeTests {
 
     @Test
     void createGame() throws ResponseException {
+        facade.clear();
+        facade.register(new RegistrationRequest("Chris","420","G"));
+        LoginResult res = facade.login(new LoginRequest("Chris","420"));
+        facade.createGame(new CreateGameRequest(res.authToken(),"Game"));
+        ListGamesResult res2 = facade.listGames(new ListGamesRequest(res.authToken()));
+        assertNotEquals(null, res2);
     }
 
     @Test
     void createGameFail() throws ResponseException {
+        facade.clear();
+        facade.register(new RegistrationRequest("Chris","420","G"));
+        LoginResult res = facade.login(new LoginRequest("Chris","420"));
+        facade.createGame(new CreateGameRequest(res.authToken(),"Game"));
+        assertThrows(ResponseException.class, () -> facade.createGame(new CreateGameRequest(res.authToken(),"Game")));
     }
 
     @Test
     void listGames() throws ResponseException{
+        facade.clear();
+        facade.register(new RegistrationRequest("Chris","420","G"));
+        LoginResult res = facade.login(new LoginRequest("Chris","420"));
+        facade.createGame(new CreateGameRequest(res.authToken(),"Game"));
+        ListGamesResult res2 = facade.listGames(new ListGamesRequest(res.authToken()));
+        assertNotEquals(null, res2);
     }
 
     @Test
     void listGamesFail() throws ResponseException{
+        facade.clear();
+        facade.register(new RegistrationRequest("Chris","420","G"));
+        LoginResult res = facade.login(new LoginRequest("Chris","420"));
+        facade.createGame(new CreateGameRequest(res.authToken(),"Game"));
+        assertThrows(ResponseException.class, () -> facade.listGames(new ListGamesRequest("beans")));
     }
 
     @Test
     void clear() throws ResponseException {
+        facade.clear();
+        facade.register(new RegistrationRequest("Chris","420","G"));
+        LoginResult res = facade.login(new LoginRequest("Chris","420"));
+        facade.createGame(new CreateGameRequest(res.authToken(),"Game"));
+        facade.clear();
+        assertThrows(ResponseException.class, () -> facade.login(new LoginRequest("Chris","420")));
     }
 }
