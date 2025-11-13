@@ -15,9 +15,9 @@ import java.net.http.HttpClient;
 public class ServerFacade {
 
     private final HttpClient client = HttpClient.newHttpClient();
-    private final String ServerUrl;
+    private final String serverUrl;
 
-    public ServerFacade(String url){ServerUrl=url;}
+    public ServerFacade(String url){serverUrl=url;}
 
     public RegistrationResult register(RegistrationRequest registrationrequest) throws ResponseException{
         var request = buildRequest("POST", "/user", registrationrequest, null);
@@ -64,7 +64,7 @@ public class ServerFacade {
 
     private HttpRequest buildRequest(String method, String path, Object body, String tokenValue) {
         var request = HttpRequest.newBuilder()
-                .uri(URI.create(ServerUrl + path))
+                .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
         if(tokenValue != null){
             request.setHeader("Authorization", tokenValue);
