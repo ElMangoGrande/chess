@@ -54,7 +54,7 @@ public class ClientPre {
     }
 
     private String login(String[] tokens) throws ResponseException{
-        if(tokens.length <2){
+        if(tokens.length <3){
             return "Usage: login <username> <password>";
         }
         var req = new LoginRequest(tokens[1], tokens[2]);

@@ -16,8 +16,8 @@ public class DrawBoard {
         System.out.print(RESET_TEXT_COLOR);
         System.out.print(ERASE_SCREEN);
 
-        String whiteLabels = "    a  b  c  d  e  f  g  h";
-        String blackLabels = "    h  g  f  e  d  c  b  a";
+        String whiteLabels = "     a  b  c   d   e   f  g  h";
+        String blackLabels = "     h  g  f   e   d   c  b  a";
 
         if (whitePerspective) {
             System.out.println(whiteLabels);
