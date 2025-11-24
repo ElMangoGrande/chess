@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
@@ -8,6 +9,10 @@ import ui.REPL;
 import websocket.commands.JoinCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,7 +37,25 @@ public class WebsocketFacade extends Endpoint {
         session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
             public void onMessage(String message){
-                repl.printMessage(message);
+                Gson gson=  new Gson();
+                ServerMessage msg = gson.fromJson(message,ServerMessage.class);
+
+                switch(msg.getServerMessageType()){
+                    case LOAD_GAME -> {
+                        LoadGameMessage load = gson.fromJson(message, LoadGameMessage.class);
+                        ChessGame game = load.getCoolGame();
+                        repl.updateGame(game);
+                        repl.renderBoard();
+                    }
+                    case NOTIFICATION -> {
+                        NotificationMessage note = gson.fromJson(message,NotificationMessage.class);
+                        repl.printMessage(note.getNotificationMessage());
+                    }
+                    case ERROR -> {
+                        ErrorMessage error = gson.fromJson(message, ErrorMessage.class);
+                        repl.printMessage(error.getErrorMessage());
+                    }
+                }
             }
         });
     }

@@ -8,6 +8,7 @@ import static ui.ClientPre.preHelp;
 import static ui.DrawBoard.drawBoard;
 import static ui.EscapeSequences.*;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
@@ -24,6 +25,7 @@ public class REPL {
     private State state = State.PRELOGIN;
     private String authToken;
     private Boolean teamColor;
+    private ChessGame currentGame;
 
     public REPL(String serverUrl){
         this.server = new ServerFacade(serverUrl);
@@ -116,6 +118,16 @@ public class REPL {
 
     public void printMessage(String message) {
         System.out.println(message);
+    }
+
+
+    public void updateGame(ChessGame game) {
+        this.currentGame = game;
+    }
+
+    public void renderBoard() {
+        ChessBoard board = currentGame.getBoard();
+        drawBoard(teamColor, board.getTiles());
     }
 
 }
