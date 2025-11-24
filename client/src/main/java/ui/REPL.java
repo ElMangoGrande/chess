@@ -120,7 +120,6 @@ public class REPL {
         System.out.println(message);
     }
 
-
     public void updateGame(ChessGame game) {
         this.currentGame = game;
     }

@@ -37,24 +37,28 @@ public class WebsocketFacade extends Endpoint {
         session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
             public void onMessage(String message){
-                Gson gson=  new Gson();
-                ServerMessage msg = gson.fromJson(message,ServerMessage.class);
+                try {
+                    Gson gson = new Gson();
+                    ServerMessage msg = gson.fromJson(message, ServerMessage.class);
 
-                switch(msg.getServerMessageType()){
-                    case LOAD_GAME -> {
-                        LoadGameMessage load = gson.fromJson(message, LoadGameMessage.class);
-                        ChessGame game = load.getCoolGame();
-                        repl.updateGame(game);
-                        repl.renderBoard();
+                    switch (msg.getServerMessageType()) {
+                        case LOAD_GAME -> {
+                            LoadGameMessage load = gson.fromJson(message, LoadGameMessage.class);
+                            ChessGame game = load.getCoolGame();
+                            repl.updateGame(game);
+                            repl.renderBoard();
+                        }
+                        case NOTIFICATION -> {
+                            NotificationMessage note = gson.fromJson(message, NotificationMessage.class);
+                            repl.printMessage(note.getNotificationMessage());
+                        }
+                        case ERROR -> {
+                            ErrorMessage error = gson.fromJson(message, ErrorMessage.class);
+                            repl.printMessage(error.getErrorMessage());
+                        }
                     }
-                    case NOTIFICATION -> {
-                        NotificationMessage note = gson.fromJson(message,NotificationMessage.class);
-                        repl.printMessage(note.getNotificationMessage());
-                    }
-                    case ERROR -> {
-                        ErrorMessage error = gson.fromJson(message, ErrorMessage.class);
-                        repl.printMessage(error.getErrorMessage());
-                    }
+                } catch (Exception e) {
+                    repl.printMessage(e.getMessage());
                 }
             }
         });

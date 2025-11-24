@@ -54,6 +54,12 @@ public class Server {
         javalin.get("/game", Server::handleListGames);
         javalin.post("/game", Server::handleCreateGame);
         javalin.put("/game", Server::handleJoinGame);
+        WebSocketHandler webby = new WebSocketHandler();
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webby);
+            ws.onMessage(webby);
+            ws.onClose(webby);
+        })
     }
 
     public int run(int desiredPort) {

@@ -19,10 +19,19 @@ public class ClientGame {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             cmd = cmd.toLowerCase();
             return switch (cmd) {
-                case "exit" -> "exit";
-                case "quit" -> "quit";
+                //case "exit" -> "exit";
+                //case "quit" -> "quit";
+                case "leave" -> leave();
+                case "make move" -> makeMove();
+                case "highlight" -> legalMoves();
+                case "resign" -> resign();
                 default -> gameHelp();
             };
+    }
+
+    public static String leave(){
+        //call leave on the websocket fascade
+        return "left game";
     }
 
     public static String gameHelp() {
