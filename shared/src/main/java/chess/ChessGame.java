@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard board;
     private boolean whiteTurn;
+    private boolean gameOver;
 
     public ChessGame() {
         this.board = new ChessBoard();
@@ -248,6 +249,11 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    public Boolean getGameOver(){return gameOver;}
+
+    public void GameOver(Boolean gameOver){this.gameOver = gameOver;}
+
 
     @Override
     public boolean equals(Object o) {

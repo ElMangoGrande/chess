@@ -1,6 +1,6 @@
 package server;
 
-import chess.ChessGame;
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.router.Endpoint;
@@ -51,19 +51,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         AuthData authData = auth(command);
         if(authData == null){
             errorMessage(ctxt,"Error: User not logged in");
+            return;
         }
-
         int gameID = joinCommand.getGameID();
-        GameData game;
+        GameData game= null;
         try{
             game = gameSQL.getGame(gameID);
         }catch(DataAccessException e){
             errorMessage(ctxt,"Error: Game not found");
+            return;
         }
-
         sessions.add(ctxt.session,gameID, authData.username());
 
-        LoadGameMessage load = new LoadGameMessage(LOAD_GAME,game);
+        LoadGameMessage load = new LoadGameMessage(LOAD_GAME,game.game());
         ctxt.send(new Gson().toJson(load));
 
         boolean isObserver = (joinCommand.getColor() == null);
@@ -74,8 +74,70 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         sessions.broadcast(ctxt.session, notification);
     }
 
-    public void makeMove(WsMessageContext ctxt, UserGameCommand command,String json){
+    public void makeMove(WsMessageContext ctxt, UserGameCommand command,String json) throws IOException {
         MakeMoveCommand moveCommand = new Gson().fromJson(json, MakeMoveCommand.class);
+        AuthData authData = auth(command);
+        if(authData == null){
+            errorMessage(ctxt,"Error: User not logged in");
+            return;
+        }
+        int gameID = moveCommand.getGameID();
+        try{
+            GameData game = gameSQL.getGame(gameID);
+            if(game.game().getGameOver()){
+                errorMessage(ctxt,"Error: game is over");
+                return;
+            }
+            boolean white = game.whiteUsername().equals(authData.username());
+            boolean black = game.blackUsername().equals(authData.username());
+            if(!white && !black){
+                errorMessage(ctxt,"Error:observers cannot make moves");
+                return;
+            }
+            ChessGame chessGame = game.game();
+            ChessMove move = moveCommand.getMove();
+            ChessPiece piece = chessGame.getBoard().getPiece(move.getStartPosition());
+            if(white){
+                if(piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+                    errorMessage(ctxt, "Error: can't move enemy pieces");
+                }
+            }else{
+                if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+                    errorMessage(ctxt, "Error: can't move enemy pieces");
+                }
+            }
+            gameSQL.updateGame(gameID,null,null,moveCommand.getMove());
+            chessGame = game.game();
+            if(white){
+                if(chessGame.isInCheckmate(ChessGame.TeamColor.BLACK)){
+                    String note = "Game Over " + game.blackUsername() + " is in checkmate by " + game.whiteUsername() +
+                    "'s " + piece;
+                    NotificationMessage notification = new NotificationMessage(NOTIFICATION, note);
+                    sessions.broadcast(ctxt.session, notification);
+                }else if(chessGame.isInStalemate(ChessGame.TeamColor.BLACK)){
+
+                }else if(chessGame.isInCheck(ChessGame.TeamColor.BLACK)){
+
+                }
+            }else{
+
+            }
+
+            LoadGameMessage load = new LoadGameMessage(LOAD_GAME,game.game());
+            sessions.broadcast(null,load);
+            String notification = authData.username() + " moved " + piece.getPieceType() + " from " +
+                    move.getStartPosition() + " to " + move.getEndPosition();
+            NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION,notification);
+            sessions.broadcast(ctxt.session,notificationMessage);
+
+        }catch(DataAccessException | InvalidMoveException e){
+            errorMessage(ctxt,e.getMessage());
+        }
+
+
+
+
+
     }
 
     public void leave(WsMessageContext ctxt, UserGameCommand command){

@@ -115,7 +115,14 @@ public class GameSQL implements GameDao{
         String gameJson = gson.toJson(game);
 
         if(username == null || color == null){
-            throw new BadMessageException("Error: bad update game request");
+            if(move != null){
+                game.game().makeMove(move);
+                String updateStatement = "UPDATE GameData SET game = ? WHERE gameID = ?";
+                DatabaseManager.executeUpdate(updateStatement,game,gameID);
+                return;
+            }else{
+                throw new BadMessageException("Error: bad update game request");
+            }
         }
         if(color.equals("WHITE")) {
             if(game.whiteUsername() == null) {
@@ -134,6 +141,13 @@ public class GameSQL implements GameDao{
         }else{
             throw new BadMessageException("Error: invalid team color");
         }
+    }
+
+    public void gameOver(int gameID) throws DataAccessException {
+        GameData game = getGame(gameID);
+        game.game().GameOver(true);
+        String updateStatement = "UPDATE GameData SET game = ? WHERE gameID = ?";
+        DatabaseManager.executeUpdate(updateStatement,game,gameID);
     }
 
     public void clear() throws DataAccessException {
