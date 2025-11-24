@@ -16,15 +16,18 @@ public class WebSocketSessions {
     }
 
     public void remove(Session session) {
-        connections.remove(session);
+        for (Map<String, Session> gameMap : connections.values()) {
+            gameMap.values().removeIf(s -> s.equals(session));
+        }
     }
 
     public void broadcast(Session excludeSession, ServerMessage notification) throws IOException {
-        String msg = notification.toString();
-        for (Session c : connections.values()) {
-            if (c.isOpen()) {
-                if (!c.equals(excludeSession)) {
-                    c.getRemote().sendString(msg);
+        String json = new com.google.gson.Gson().toJson(notification);
+
+        for (Map<String,Session> gameMap : connections.values()) {
+            for(Session s : gameMap.values()){
+                if(s.isOpen() && !s.equals(excludeSession)){
+                    s.getRemote().sendString(json);
                 }
             }
         }

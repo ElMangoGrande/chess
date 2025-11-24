@@ -59,7 +59,7 @@ public class Server {
             ws.onConnect(webby);
             ws.onMessage(webby);
             ws.onClose(webby);
-        })
+        });
     }
 
     public int run(int desiredPort) {
