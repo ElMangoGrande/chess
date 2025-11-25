@@ -143,6 +143,18 @@ public class GameSQL implements GameDao{
         }
     }
 
+    public void leaveGame(int gameID, String color) throws DataAccessException {
+        if(color != null){
+            if(color.equals("BLACK")){
+                String updateStatement = "UPDATE GameData SET blackUsername = ? WHERE gameID = ?";
+                DatabaseManager.executeUpdate(updateStatement,null,gameID);
+            } else if (color.equals("WHITE")) {
+                String updateStatement = "UPDATE GameData SET whiteUsername = ? WHERE gameID = ?";
+                DatabaseManager.executeUpdate(updateStatement,null,gameID);
+            }
+        }
+    }
+
     public void gameOver(int gameID) throws DataAccessException {
         GameData game = getGame(gameID);
         game.game().GameOver(true);
