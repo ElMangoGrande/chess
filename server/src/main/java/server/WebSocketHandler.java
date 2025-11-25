@@ -172,11 +172,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             errorMessage(ctxt,e.getMessage());
             return;
         }
-
         String username = authData.username();
-
         sessions.remove(ctxt.session);
-
         boolean isWhite = (Objects.equals(username, gameData.whiteUsername()));
         boolean isBlack = (Objects.equals(username,gameData.blackUsername()));
         boolean isObserver = (!isWhite && !isBlack);
@@ -196,7 +193,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 return;
             }
         }
-
         String note = isObserver
                 ? username + " left the game (observer)."
                 : username + " left the game.";
@@ -204,8 +200,36 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         sessions.broadcast(ctxt.session,n);
     }
 
-    public void resign(WsMessageContext ctxt, UserGameCommand command){
+    public void resign(WsMessageContext ctxt, UserGameCommand command) throws IOException {
+        AuthData authData = auth(command);
+        if(authData == null){
+            errorMessage(ctxt,"Error: User not logged in");
+            return;
+        }
+        int gameID = command.getGameID();
+        GameData gameData;
+        try {
+            gameData = gameSQL.getGame(gameID);
+        } catch (DataAccessException e) {
+            errorMessage(ctxt, e.getMessage());
+            return;
+        }
+        String username = authData.username();
+        boolean isWhite = username.equals(gameData.whiteUsername());
+        boolean isBlack = username.equals(gameData.blackUsername());
+        if(!isWhite && !isBlack){
+            errorMessage(ctxt,"Error: observers cannot resign");
+            return;
+        }
+        try{
+            gameSQL.gameOver(gameID);
+        } catch (DataAccessException e) {
+            errorMessage(ctxt,e.getMessage());
+        }
 
+        String note = username + " resigned. Game Over";
+        NotificationMessage n = new NotificationMessage(NOTIFICATION,note);
+        sessions.broadcast(null,n);
     }
 
     public AuthData auth(UserGameCommand command){
