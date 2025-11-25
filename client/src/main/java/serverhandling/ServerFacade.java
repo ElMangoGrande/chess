@@ -103,6 +103,10 @@ public class ServerFacade {
 
         return null;
     }
+
+    public String getUrl() {
+        return this.serverUrl;
+    }
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }

@@ -13,6 +13,7 @@ import chess.ChessGame;
 import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
 import ui.*;
+import websocket.WebsocketFacade;
 
 public class REPL {
 
@@ -20,6 +21,8 @@ public class REPL {
     private ClientPost post;
     private ClientPre pre;
     private final ServerFacade server;
+    private WebsocketFacade ws;
+
 
     private enum State { PRELOGIN, POSTLOGIN, INGAME }
     private State state = State.PRELOGIN;
@@ -62,7 +65,7 @@ public class REPL {
         }
     }
 
-    public String eval(String input) throws ResponseException {
+    public String eval(String input) throws Exception {
         if (input.equalsIgnoreCase("quit")) {
             return "quit";
         }
@@ -102,7 +105,10 @@ public class REPL {
             }
             case "observe", "joined game"->{
                 state = State.INGAME;
-                drawBoard(post.getColor(),new ChessGame().getBoard().getTiles());
+                ws = new WebsocketFacade(this, server.getUrl());
+                ws.connect(authToken, post.getGameID(), post.getColor());
+                teamColor = post.isWhitePerspective();
+                drawBoard(teamColor,new ChessGame().getBoard().getTiles());
                 return "entering game...";
             }
             case "exit"->{

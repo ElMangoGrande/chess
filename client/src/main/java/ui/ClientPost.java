@@ -17,7 +17,8 @@ public class ClientPost {
     private final ServerFacade server;
     private String authToken;
     private final Map<Integer,Integer> mappyTheMap;
-    private Boolean teamColor;
+    private int gameID;
+    private String color;
 
     public ClientPost(ServerFacade server) {
         this.server = server;
@@ -97,11 +98,7 @@ public class ClientPost {
         if (tokens.length != 2) {
             return "Usage: join <ID> [WHITE|BLACK]";
         }
-        if(tokens[1].equalsIgnoreCase("WHITE")){
-            teamColor = true;
-        }else{
-            teamColor = false;
-        }
+        this.color = tokens[1].equalsIgnoreCase("WHITE") ? "WHITE" : "BLACK";
         int realID;
         if(tokens[0].matches("-?\\d+")){
             int gameID = parseInt(tokens[0]);
@@ -113,6 +110,7 @@ public class ClientPost {
         }else{
             return "Error: GameID must be number";
         }
+        this.gameID =realID;
 
         var req = new JoinGameRequest(tokens[1].toUpperCase(),realID,authToken);
         server.joinGame(req);
@@ -120,7 +118,28 @@ public class ClientPost {
     }
 
     private String observe(String[] tokens) throws ResponseException{
-        teamColor = true;
+        if (tokens.length != 1) {
+            return "Usage: observe <ID>";
+        }
+
+        int realID;
+        if (tokens[0].matches("-?\\d+")) {
+            int userID = Integer.parseInt(tokens[0]);
+            try {
+                realID = mappyTheMap.get(userID);
+            } catch (NullPointerException e) {
+                return "Error: invalid game ID";
+            }
+        } else {
+            return "Error: GameID must be number";
+        }
+
+        this.gameID = realID;
+        this.color = null;
+
+        var req = new JoinGameRequest(null, realID, authToken);
+        server.joinGame(req);
+
         return "observe";
     }
 
@@ -129,10 +148,18 @@ public class ClientPost {
         server.logout(req);
         return "logged out";
     }
-
-    public Boolean getColor(){
-        return teamColor;
+    public boolean isWhitePerspective() {
+        if (color == null) return true;     // observers
+        return color.equalsIgnoreCase("WHITE");
     }
 
+
+    public int getGameID() {
+        return gameID;
+    }
+
+    public String getColor() {
+        return color;
+    }
 }
 
