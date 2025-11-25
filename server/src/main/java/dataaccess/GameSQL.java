@@ -117,8 +117,9 @@ public class GameSQL implements GameDao{
         if(username == null || color == null){
             if(move != null){
                 game.game().makeMove(move);
+                gameJson = gson.toJson(game.game());
                 String updateStatement = "UPDATE GameData SET game = ? WHERE gameID = ?";
-                DatabaseManager.executeUpdate(updateStatement,game,gameID);
+                DatabaseManager.executeUpdate(updateStatement,gameJson,gameID);
                 return;
             }else{
                 throw new BadMessageException("Error: bad update game request");
@@ -158,8 +159,10 @@ public class GameSQL implements GameDao{
     public void gameOver(int gameID) throws DataAccessException {
         GameData game = getGame(gameID);
         game.game().GameOver(true);
+        Gson gson = new Gson();
+        String updatedJson = gson.toJson(game.game());
         String updateStatement = "UPDATE GameData SET game = ? WHERE gameID = ?";
-        DatabaseManager.executeUpdate(updateStatement,game,gameID);
+        DatabaseManager.executeUpdate(updateStatement,updatedJson,gameID);
     }
 
     public void clear() throws DataAccessException {

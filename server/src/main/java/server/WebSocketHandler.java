@@ -58,7 +58,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         GameData game= null;
         try{
             game = gameSQL.getGame(gameID);
-        }catch(DataAccessException e){
+        }catch(Exception e){
             errorMessage(ctxt,"Error: Game not found");
             return;
         }
@@ -69,10 +69,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         boolean isObserver = (joinCommand.getColor() == null);
 
+        if(!isObserver){
+            try{
+                gameSQL.updateGame(gameID, joinCommand.getColor(), authData.username(), null);
+            } catch (DataAccessException | InvalidMoveException e) {
+                errorMessage(ctxt,e.getMessage());
+                return;
+            }
+        }
+
         String note = (isObserver ? authData.username() + " is observing the game."
                 : authData.username() + " joined as "+ joinCommand.getColor());
         NotificationMessage notification = new NotificationMessage(NOTIFICATION, note);
-        sessions.broadcast(ctxt.session, notification);
+        sessions.broadcast(ctxt.session, notification,gameID);
     }
 
     public void makeMove(WsMessageContext ctxt, UserGameCommand command,String json) throws IOException {
@@ -89,7 +98,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             GameData game = gameSQL.getGame(gameID);
             //game over check
             if(game.game().getGameOver()){
-                errorMessage(ctxt,"Error: game is over");
+                errorMessage(ctxt, "Error: Game Over");
                 return;
             }
             boolean white = game.whiteUsername().equals(authData.username());
@@ -106,22 +115,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 return;
             }
             if(white && piece.getTeamColor() == ChessGame.TeamColor.BLACK){
-                    errorMessage(ctxt, "Error: can't move enemy pieces");
+                errorMessage(ctxt, "Error: can't move enemy pieces");
+                return;
             }
             if(black && piece.getTeamColor() == ChessGame.TeamColor.WHITE){
                 errorMessage(ctxt, "Error: can't move enemy pieces");
+                return;
             }
-
-            gameSQL.updateGame(gameID,null,null,moveCommand.getMove());
-            //to get updated game
-            chessGame = game.game();
-
-            LoadGameMessage load = new LoadGameMessage(LOAD_GAME,game.game());
-            sessions.broadcast(null,load);
-            String notification = authData.username() + " moved " + piece.getPieceType() + " from " +
-                    move.getStartPosition() + " to " + move.getEndPosition();
-            NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION,notification);
-            sessions.broadcast(ctxt.session,notificationMessage);
+            if ((white && game.game().getTeamTurn() != ChessGame.TeamColor.WHITE) ||
+                    (black && game.game().getTeamTurn() != ChessGame.TeamColor.BLACK)) {
+                errorMessage(ctxt, "Error: not your turn!");
+                return;
+            }
 
             ChessGame.TeamColor opponent = white ?
                     ChessGame.TeamColor.BLACK :
@@ -132,22 +137,36 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String moverUser = white
                     ? game.whiteUsername()
                     : game.blackUsername();
-            if(chessGame.isInCheck(opponent)){
+
+            gameSQL.updateGame(gameID,null,null,moveCommand.getMove());
+            //to get updated game
+            game = gameSQL.getGame(gameID);
+            chessGame = game.game();
+
+            LoadGameMessage load = new LoadGameMessage(LOAD_GAME,game.game());
+            sessions.broadcast(null,load,gameID);
+            String notification = authData.username() + " moved " + piece.getPieceType() + " from " +
+                    move.getStartPosition() + " to " + move.getEndPosition();
+            NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION,notification);
+            sessions.broadcast(ctxt.session,notificationMessage,gameID);
+
+            if(chessGame.isInCheckmate(opponent)){
+                gameSQL.gameOver(gameID);
                 String note = "Game Over " + opponentUser + " was checkmated by " + moverUser +".";
                 NotificationMessage m = new NotificationMessage(NOTIFICATION, note);
-                sessions.broadcast(null,m);
+                sessions.broadcast(null,m,gameID);
                 return;
             }
             if(chessGame.isInStalemate(opponent)){
                 String note = "Game Over: Stalemate";
                 NotificationMessage m = new NotificationMessage(NOTIFICATION,note);
-                sessions.broadcast(null,m);
+                sessions.broadcast(null,m,gameID);
                 return;
             }
             if(chessGame.isInCheck(opponent)){
                 String note = opponentUser + " is in check.";
                 NotificationMessage m = new NotificationMessage(NOTIFICATION,note);
-                sessions.broadcast(null,m);
+                sessions.broadcast(null,m,gameID);
             }
 
         }catch(DataAccessException | InvalidMoveException e){
@@ -197,7 +216,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 ? username + " left the game (observer)."
                 : username + " left the game.";
         NotificationMessage n = new NotificationMessage(NOTIFICATION,note);
-        sessions.broadcast(ctxt.session,n);
+        sessions.broadcast(ctxt.session,n,gameID);
     }
 
     public void resign(WsMessageContext ctxt, UserGameCommand command) throws IOException {
@@ -221,15 +240,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             errorMessage(ctxt,"Error: observers cannot resign");
             return;
         }
+        if(gameData.game().getGameOver()){
+            errorMessage(ctxt, "Error: Game is already over silly");
+            return;
+        }
         try{
             gameSQL.gameOver(gameID);
         } catch (DataAccessException e) {
             errorMessage(ctxt,e.getMessage());
         }
-
         String note = username + " resigned. Game Over";
         NotificationMessage n = new NotificationMessage(NOTIFICATION,note);
-        sessions.broadcast(null,n);
+        sessions.broadcast(null,n,gameID);
     }
 
     public AuthData auth(UserGameCommand command){

@@ -22,15 +22,14 @@ public class WebSocketSessions {
         }
     }
 
-    public void broadcast(Session excludeSession, ServerMessage notification) throws IOException {
+    public void broadcast(Session excludeSession, ServerMessage notification, int gameID) throws IOException {
+        Map<String,Session> gameSession = connections.get(gameID);
         String json = new Gson().toJson(notification);
-
-        for (Map<String,Session> gameMap : connections.values()) {
-            for(Session s : gameMap.values()){
+            for(Session s : gameSession.values()){
                 if(s.isOpen() && !s.equals(excludeSession)){
                     s.getRemote().sendString(json);
                 }
             }
-        }
+
     }
 }

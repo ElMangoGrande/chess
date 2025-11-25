@@ -38,7 +38,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        whiteTurn = team == TeamColor.WHITE;
+        whiteTurn = (team == TeamColor.WHITE);
     }
 
     /**
@@ -114,7 +114,6 @@ public class ChessGame {
             whiteTurn = !whiteTurn;
 
         } else {
-            whiteTurn = !whiteTurn;
             throw new InvalidMoveException("invalid move");
         }
 
