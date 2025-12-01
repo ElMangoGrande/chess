@@ -9,10 +9,7 @@ import static ui.ClientPre.preHelp;
 import static ui.DrawBoard.drawBoard;
 import static ui.EscapeSequences.*;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
+import chess.*;
 import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
 import ui.*;
@@ -141,6 +138,16 @@ public class REPL {
                 move = new ChessMove(move.getStartPosition(),move.getEndPosition(),promotionHelper(move));
                 ws.makeMove(authToken,currentGameID,move);
                 return "move made!";
+            }
+            case "highlight" ->{
+                ChessPosition position = game.getPos();
+                DrawBoard.highlightSquares(currentGame,position);
+                DrawBoard.drawBoard(teamColor,currentGame.getBoard().getTiles());
+                return "highlighted moves are valid";
+            }
+            case "redraw" ->{
+                DrawBoard.drawBoard(teamColor,currentGame.getBoard().getTiles());
+                return "board has been redrawn";
             }
 
             default ->{

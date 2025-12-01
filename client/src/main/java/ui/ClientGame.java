@@ -13,6 +13,7 @@ public class ClientGame {
 
     private final ServerFacade server;
     private ChessMove moveToMake;
+    private ChessPosition pos;
 
 
     public ClientGame(ServerFacade server) {
@@ -30,13 +31,20 @@ public class ClientGame {
                 //case "exit" -> "exit";
                 //case "quit" -> "quit";
                 case "leave" -> leave(params);
-                case "make move" -> makeMove();
-                case "highlight" -> legalMoves();
+                case "make move" -> makeMove(params);
+                case "highlight" -> highlight(params);
                 case "resign" -> resign(params);
+                case "redraw" -> redraw(params);
                 default -> gameHelp();
             };
     }
 
+    public String redraw(String[] params){
+        if(params.length != 0){
+            return "Usage: redraw";
+        }
+        return "redraw";
+    }
     public String leave(String[] params){
         if(params.length != 0){
             return "Usage: leave";
@@ -68,12 +76,26 @@ public class ClientGame {
         return "usage: makeMove a2 b3";
     }
 
-    public String legalMoves(){
-
+    public String highlight(String[] params){
+        if(params.length != 1){
+            return "Usage: highlight a1";
+        }
+        if(params[0].length() != 2){
+            return "Usage: highlight a1";
+        }
+        if(params[0].matches("^[a-h][1-8]$")){
+            pos = new ChessPosition(params[0].charAt(1)-'0',(params[0].charAt(0)-'a')+1);
+            return "highlight";
+        }
+        return "Usage: highlight a1";
     }
 
     public ChessMove getMoveToMake() {
         return moveToMake;
+    }
+
+    public ChessPosition getPos() {
+        return pos;
     }
 
     public String gameHelp() {

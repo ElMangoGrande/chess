@@ -1,15 +1,21 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
+import chess.ChessPosition;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static ui.EscapeSequences.*;
 
 public class DrawBoard {
 
-
+    private static final List<ChessPosition> highlighted = new ArrayList<>();
+    private static ChessPosition start;
 
 
     public static void drawBoard(boolean whitePerspective,ChessPiece[][] tiles) {
@@ -26,7 +32,7 @@ public class DrawBoard {
                 System.out.print(" " + (8 - row) + " ");
                 for (int col = 0; col < 8; col++) {
                     boolean isLight = (row + col) % 2 == 0;
-                    printTile(tiles[row][col], isLight);
+                    printTile(tiles[row][col], isLight, new ChessPosition(row,col));
                 }
                 System.out.println(" " + (8 - row));
             }
@@ -37,17 +43,23 @@ public class DrawBoard {
                 System.out.print(" " + (8 - row) + " ");
                 for (int col = 7; col >= 0; col--) {
                     boolean isLight = (row + col) % 2 == 0;
-                    printTile(tiles[row][col], isLight);
+                    printTile(tiles[row][col], isLight, new ChessPosition(row,col));
                 }
                 System.out.println(" " + (8 - row));
             }
             System.out.println(blackLabels);
         }
+        start= null;
+        highlighted.clear();
     }
 
-    private static void printTile(ChessPiece piece, boolean isLightSquare) {
+    private static void printTile(ChessPiece piece, boolean isLightSquare, ChessPosition position) {
         String bgColor = isLightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
-
+        if(position.equals(start)){
+            bgColor = SET_BG_COLOR_YELLOW;
+        }else if(highlighted.contains(position)){
+            bgColor = isLightSquare ? SET_BG_COLOR_MAGENTA : SET_BG_COLOR_BLUE;
+        }
         String pieceStr;
         if (piece == null) {
             pieceStr = EMPTY;
@@ -56,6 +68,18 @@ public class DrawBoard {
         }
 
         System.out.print(bgColor + pieceStr + RESET_BG_COLOR + RESET_TEXT_COLOR);
+    }
+
+    static void highlightSquares(ChessGame game, ChessPosition position){
+        if(game.getBoard().getPiece(start) == null){
+            System.out.println("Error: you chose an empty square");
+            return;
+        }
+        start = position;
+        Collection<ChessMove> goodMoves = game.validMoves(position);
+        for( ChessMove move : goodMoves){
+            highlighted.add(move.getEndPosition());
+        }
     }
 
 
