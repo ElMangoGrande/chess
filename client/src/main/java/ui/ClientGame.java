@@ -1,8 +1,10 @@
 package ui;
 
-import serverhandling.ResponseException;
+import chess.ChessMove;
+import chess.ChessPosition;
 import serverhandling.ServerFacade;
-import websocket.WebsocketFacade;
+
+import java.util.Arrays;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
@@ -10,53 +12,68 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 public class ClientGame {
 
     private final ServerFacade server;
-    private WebsocketFacade ws;
-    private String authToken;
-    private int gameID;
-    private boolean whitePerspective;
+    private ChessMove moveToMake;
+
 
     public ClientGame(ServerFacade server) {
         this.server = server;
     }
 
-    public void attachWebSocket(WebsocketFacade ws, String auth, int id, boolean white) {
-        this.ws = ws;
-        this.authToken = auth;
-        this.gameID = id;
-        this.whitePerspective = white;
-    }
+
 
     public String eval(String input) {
             String[] tokens = input.split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
+            String[] params = Arrays.copyOfRange(tokens,1,tokens.length);
             cmd = cmd.toLowerCase();
             return switch (cmd) {
                 //case "exit" -> "exit";
                 //case "quit" -> "quit";
-                case "leave" -> leave();
+                case "leave" -> leave(params);
                 case "make move" -> makeMove();
                 case "highlight" -> legalMoves();
-                case "resign" -> resign();
+                case "resign" -> resign(params);
                 default -> gameHelp();
             };
     }
 
-    public String leave(){
-        try {
-            ws.leaveGame(authToken, gameID);
-            return "left game";
-        } catch (ResponseException e) {
-            return "Error: " + e.getMessage();
+    public String leave(String[] params){
+        if(params.length != 0){
+            return "Usage: leave";
         }
+        return "leave";
     }
 
-    public String resign() {
-        try {
-            ws.resignGame(authToken, gameID);
-            return "You have resigned.\n";
-        } catch (ResponseException e) {
-            return "Error: " + e.getMessage();
+    public String resign(String[] params) {
+        if(params.length != 0){
+            return "Usage: resign";
         }
+        return "resign";
+    }
+
+    public String makeMove(String[] params){
+        //parse moves
+        if(params.length !=2){
+            return "usage: makeMove a2 b3";
+        }
+        if(params[0].length() !=2 || params[1].length() != 2){
+            return "usage: makeMove a2 b3";
+        }
+        if(params[0].matches("^[a-h][1-8]$") && params[1].matches("^[a-h][1-8]$")){
+            ChessPosition start = new ChessPosition(params[0].charAt(1)-'0',(params[0].charAt(0)-'a')+1);
+            ChessPosition finish = new ChessPosition(params[1].charAt(1)-'0',(params[1].charAt(0)-'a')+1);
+            moveToMake = new ChessMove(start,finish,null);
+            return "move";
+        }
+        return "usage: makeMove a2 b3";
+    }
+
+    public String legalMoves(){
+
+    }
+
+    public ChessMove getMoveToMake() {
+        return moveToMake;
     }
 
     public String gameHelp() {

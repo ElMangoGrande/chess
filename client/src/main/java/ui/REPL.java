@@ -1,6 +1,7 @@
 package ui;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.ClientPost.postHelp;
@@ -10,6 +11,8 @@ import static ui.EscapeSequences.*;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import serverhandling.ResponseException;
 import serverhandling.ServerFacade;
 import ui.*;
@@ -29,12 +32,17 @@ public class REPL {
     private String authToken;
     private Boolean teamColor;
     private ChessGame currentGame;
+    private int currentGameID;
+    private String currentColor;
+    private String serverUrl;
+    private Scanner scanner;
 
     public REPL(String serverUrl){
         this.server = new ServerFacade(serverUrl);
         game = new ClientGame(server);
         post = new ClientPost(server);
         pre = new ClientPre(server);
+        this.serverUrl = serverUrl;
 
     }
 
@@ -46,7 +54,7 @@ public class REPL {
         System.out.println("Welcome to Chess. Type help or else");
         System.out.print(preHelp());
 
-        Scanner scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in);
         var result = "";
 
         while(!result.equals("quit")){
@@ -105,21 +113,55 @@ public class REPL {
             }
             case "observe", "joined game"->{
                 state = State.INGAME;
-                ws = new WebsocketFacade(this, server.getUrl());
-                ws.connect(authToken, post.getGameID(), post.getColor());
                 teamColor = post.isWhitePerspective();
-                drawBoard(teamColor,new ChessGame().getBoard().getTiles());
-                return "entering game...";
+                currentGameID = post.getGameID();
+                currentColor = post.getColor();
+                if(ws == null){
+                    ws = new WebsocketFacade(this, this.serverUrl);
+                }
+                ws.connect(authToken,currentGameID,currentColor);
+                //drawBoard(teamColor,new ChessGame().getBoard().getTiles());
+                return "entering game...\n" + game.gameHelp();
             }
-            case "exit"->{
+            case "leave" ->{
                 state = State.POSTLOGIN;
-                return "leaving Game \n" + postHelp();
+                ws.leaveGame(authToken,currentGameID);
+                return "Leaving Game\n" + postHelp();
             }
+            case "resign" ->{
+                System.out.println("Are you sure you want to resign?");
+                if(Objects.equals(scanner.nextLine().toLowerCase(), "yes")){
+                    ws.resignGame(authToken,currentGameID);
+                    return "You have resigned.";
+                }
+                return "You have not resigned\n" + game.gameHelp();
+            }
+            case "move" ->{
+                ChessMove move = game.getMoveToMake();
+                move = new ChessMove(move.getStartPosition(),move.getEndPosition(),promotionHelper(move));
+                ws.makeMove(authToken,currentGameID,move);
+                return "move made!";
+            }
+
             default ->{
                 return result;
             }
 
         }
+    }
+    
+    public ChessPiece.PieceType promotionHelper(ChessMove move){
+        if(currentGame.getBoard().getPiece(move.getStartPosition()).getTeamColor() == ChessGame.TeamColor.WHITE &&
+                move.getEndPosition().getRow()== 8 || currentGame.getBoard().getPiece(move.getStartPosition()).getTeamColor()
+                == ChessGame.TeamColor.BLACK && move.getEndPosition().getRow()== 1){
+            switch(scanner.nextLine().toLowerCase()){
+                case "queen" -> {return ChessPiece.PieceType.QUEEN;}
+                case "knight" -> {return ChessPiece.PieceType.KNIGHT;}
+                case "bishop" -> {return ChessPiece.PieceType.BISHOP;}
+                case "rook" -> {return ChessPiece.PieceType.ROOK;}
+            }
+        }
+        return null;
     }
 
     public void printMessage(String message) {
