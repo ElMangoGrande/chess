@@ -126,6 +126,12 @@ public class REPL {
                 return "Leaving Game\n" + postHelp();
             }
             case "resign" ->{
+                if (currentColor == null) {
+                    return "You cannot resign as an observer.";
+                }
+                if(currentGame.getGameOver()){
+                    return "Game is already over you silly";
+                }
                 System.out.println("Are you sure you want to resign?");
                 if(Objects.equals(scanner.nextLine().toLowerCase(), "yes")){
                     ws.resignGame(authToken,currentGameID);
@@ -137,7 +143,7 @@ public class REPL {
                 ChessMove move = game.getMoveToMake();
                 move = new ChessMove(move.getStartPosition(),move.getEndPosition(),promotionHelper(move));
                 ws.makeMove(authToken,currentGameID,move);
-                return "move made!";
+                return "attempting to make a move...";
             }
             case "highlight" ->{
                 ChessPosition position = game.getPos();

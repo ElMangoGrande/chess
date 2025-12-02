@@ -101,8 +101,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 errorMessage(ctxt, "Error: Game Over");
                 return;
             }
-            boolean white = game.whiteUsername().equals(authData.username());
-            boolean black = game.blackUsername().equals(authData.username());
+            boolean white = authData.username().equals(game.whiteUsername());
+            boolean black = authData.username().equals(game.blackUsername());
             if(!white && !black){
                 errorMessage(ctxt,"Error:observers cannot make moves");
                 return;
@@ -158,7 +158,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 return;
             }
             if(chessGame.isInStalemate(opponent)){
-                String note = "Game Over: Stalemate";
+                String note = "Game Over: " + opponentUser + " was Stalemated by " + moverUser;
                 NotificationMessage m = new NotificationMessage(NOTIFICATION,note);
                 sessions.broadcast(null,m,gameID);
                 return;

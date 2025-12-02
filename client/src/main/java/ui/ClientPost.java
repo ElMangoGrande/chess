@@ -137,8 +137,8 @@ public class ClientPost {
         this.gameID = realID;
         this.color = null;
 
-        var req = new JoinGameRequest(null, realID, authToken);
-        server.joinGame(req);
+//        var req = new JoinGameRequest(null, realID, authToken);
+//        server.joinGame(req);
 
         return "observe";
     }
