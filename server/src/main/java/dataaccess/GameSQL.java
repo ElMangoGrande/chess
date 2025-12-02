@@ -158,7 +158,7 @@ public class GameSQL implements GameDao{
 
     public void gameOver(int gameID) throws DataAccessException {
         GameData game = getGame(gameID);
-        game.game().GameOver(true);
+        game.game().gameOver(true);
         Gson gson = new Gson();
         String updatedJson = gson.toJson(game.game());
         String updateStatement = "UPDATE GameData SET game = ? WHERE gameID = ?";

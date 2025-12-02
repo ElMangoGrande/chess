@@ -14,7 +14,7 @@ import static ui.EscapeSequences.*;
 
 public class DrawBoard {
 
-    private static final List<ChessPosition> highlighted = new ArrayList<>();
+    private static final List<ChessPosition> HIGHLIGHTED = new ArrayList<>();
     private static ChessPosition start;
 
 
@@ -54,14 +54,14 @@ public class DrawBoard {
             System.out.println(blackLabels);
         }
         start= null;
-        highlighted.clear();
+        HIGHLIGHTED.clear();
     }
 
     private static void printTile(ChessPiece piece, boolean isLightSquare, ChessPosition position) {
         String bgColor = isLightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
         if(position.equals(start)){
             bgColor = SET_BG_COLOR_YELLOW;
-        }else if(highlighted.contains(position)){
+        }else if(HIGHLIGHTED.contains(position)){
             bgColor = isLightSquare ? SET_BG_COLOR_MAGENTA : SET_BG_COLOR_BLUE;
         }
         String pieceStr;
@@ -87,7 +87,7 @@ public class DrawBoard {
         }
         Collection<ChessMove> goodMoves = game.validMoves(position);
         for( ChessMove move : goodMoves){
-            highlighted.add(move.getEndPosition());
+            HIGHLIGHTED.add(move.getEndPosition());
         }
     }
 

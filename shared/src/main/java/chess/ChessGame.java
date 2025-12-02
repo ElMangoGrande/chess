@@ -251,7 +251,7 @@ public class ChessGame {
 
     public Boolean getGameOver(){return gameOver;}
 
-    public void GameOver(Boolean gameOver){this.gameOver = gameOver;}
+    public void gameOver(Boolean gameOver){this.gameOver = gameOver;}
 
 
     @Override

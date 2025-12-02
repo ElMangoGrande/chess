@@ -149,7 +149,7 @@ public class ClientPost {
         return "logged out";
     }
     public boolean isWhitePerspective() {
-        if (color == null) return true;     // observers
+        if (color == null){ return true;}
         return color.equalsIgnoreCase("WHITE");
     }
 

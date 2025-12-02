@@ -66,14 +66,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         boolean isObserver = (joinCommand.getColor() == null);
 
-//        if(!isObserver){
-//            try{
-//                gameSQL.updateGame(gameID, joinCommand.getColor(), authData.username(), null);
-//            } catch (DataAccessException | InvalidMoveException e) {
-//                errorMessage(ctxt,e.getMessage());
-//                return;
-//            }
-//        }
 
         String note = (isObserver ? authData.username() + " is observing the game."
                 : authData.username() + " joined as "+ joinCommand.getColor());
