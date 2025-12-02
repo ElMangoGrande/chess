@@ -25,7 +25,9 @@ public class WebsocketFacade extends Endpoint {
 
     public WebsocketFacade(REPL repl, String url) throws Exception {
         this.repl = repl;
-        URI uri = new URI(url.replace("http","ws"));
+        String ur = url.replace("http","ws");
+        ur += "/ws";
+        URI uri = new URI(ur);
         WebSocketContainer contain = ContainerProvider.getWebSocketContainer();
         contain.connectToServer(this,uri);
 

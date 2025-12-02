@@ -32,7 +32,9 @@ public class DrawBoard {
                 System.out.print(" " + (8 - row) + " ");
                 for (int col = 0; col < 8; col++) {
                     boolean isLight = (row + col) % 2 == 0;
-                    printTile(tiles[row][col], isLight, new ChessPosition(row,col));
+                    int rank = 8 - row;
+                    int file = col + 1;
+                    printTile(tiles[row][col], isLight, new ChessPosition(rank,file));
                 }
                 System.out.println(" " + (8 - row));
             }
@@ -43,7 +45,9 @@ public class DrawBoard {
                 System.out.print(" " + (8 - row) + " ");
                 for (int col = 7; col >= 0; col--) {
                     boolean isLight = (row + col) % 2 == 0;
-                    printTile(tiles[row][col], isLight, new ChessPosition(row,col));
+                    int rank = 8 - row;
+                    int file = col + 1;
+                    printTile(tiles[row][col], isLight, new ChessPosition(rank,file));
                 }
                 System.out.println(" " + (8 - row));
             }
@@ -71,11 +75,16 @@ public class DrawBoard {
     }
 
     static void highlightSquares(ChessGame game, ChessPosition position){
-        if(game.getBoard().getPiece(start) == null){
-            System.out.println("Error: you chose an empty square");
+        start = position;
+        if (position == null) {
+            System.out.println("Error: no position chosen");
             return;
         }
-        start = position;
+        if(game.getBoard().getPiece(start) == null){
+            System.out.println("Error: you chose an empty square");
+            start = null;
+            return;
+        }
         Collection<ChessMove> goodMoves = game.validMoves(position);
         for( ChessMove move : goodMoves){
             highlighted.add(move.getEndPosition());

@@ -18,6 +18,7 @@ public class ClientGame {
 
     public ClientGame(ServerFacade server) {
         this.server = server;
+        System.out.println("NEW CLIENTGAME INSTANCE: " + this);
     }
 
 
@@ -31,7 +32,7 @@ public class ClientGame {
                 //case "exit" -> "exit";
                 //case "quit" -> "quit";
                 case "leave" -> leave(params);
-                case "make move" -> makeMove(params);
+                case "makemove" -> makeMove(params);
                 case "highlight" -> highlight(params);
                 case "resign" -> resign(params);
                 case "redraw" -> redraw(params);
@@ -77,6 +78,7 @@ public class ClientGame {
     }
 
     public String highlight(String[] params){
+
         if(params.length != 1){
             return "Usage: highlight a1";
         }
@@ -87,6 +89,7 @@ public class ClientGame {
             pos = new ChessPosition(params[0].charAt(1)-'0',(params[0].charAt(0)-'a')+1);
             return "highlight";
         }
+
         return "Usage: highlight a1";
     }
 
@@ -99,11 +102,18 @@ public class ClientGame {
     }
 
     public String gameHelp() {
-        return SET_TEXT_COLOR_BLUE +"exit"
-                + RESET_TEXT_COLOR + " - to return to logged in\n" +
-                SET_TEXT_COLOR_BLUE +"quit"
-                + RESET_TEXT_COLOR +" - to leave chess\n"
-                + SET_TEXT_COLOR_BLUE+"help" + RESET_TEXT_COLOR +"lists possible commands\n";
+        return SET_TEXT_COLOR_BLUE +"leave"
+                + RESET_TEXT_COLOR + " - to exit a game\n" +
+                SET_TEXT_COLOR_BLUE +"resign"
+                + RESET_TEXT_COLOR +" - to forfeit a chess game\n" +
+                SET_TEXT_COLOR_BLUE +"makemove"
+                + RESET_TEXT_COLOR + " - to make a move, input move like 'make move a2 a3'\n"
+                + SET_TEXT_COLOR_BLUE +"highlight"
+                + RESET_TEXT_COLOR + " - to draw the board with all available moves highlighted\n"
+                + SET_TEXT_COLOR_BLUE +"redraw"
+                + RESET_TEXT_COLOR + " - to draw the board again\n"
+                + SET_TEXT_COLOR_BLUE+"help"
+                + RESET_TEXT_COLOR +" - lists possible commands\n";
     }
 
 }
